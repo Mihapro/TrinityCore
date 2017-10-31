@@ -450,14 +450,13 @@ public:
         void DamageTaken(Unit* /*attacker*/, uint32 &damage) override
         {
             // Because only one image explodes, others become passive
-            if (me->GetReactState() != REACT_AGGRESSIVE)
+            if (me->GetReactState() != REACT_AGGRESSIVE || me->GetHealth() > damage)
                 return;
 
-            if (me->GetHealth() <= damage)
-            {
-                damage = me->GetHealth() - 1;
-                DoCast(me, SPELL_IMAGE_EXPLOSION);
-            }
+            me->SetReactState(REACT_PASSIVE);
+
+            damage = me->GetHealth() - 1;
+            DoCast(me, SPELL_IMAGE_EXPLOSION);
         }
 
         void DoAction(int32 action) override
@@ -535,14 +534,13 @@ public:
         void DamageTaken(Unit* /*attacker*/, uint32 &damage) override
         {
             // Because only one image explodes, others become passive
-            if (me->GetReactState() != REACT_AGGRESSIVE)
+            if (me->GetReactState() != REACT_AGGRESSIVE || me->GetHealth() > damage)
                 return;
 
-            if (me->GetHealth() <= damage)
-            {
-                damage = me->GetHealth() - 1;
-                DoCast(me, SPELL_IMAGE_EXPLOSION);
-            }
+            me->SetReactState(REACT_PASSIVE);
+
+            damage = me->GetHealth() - 1;
+            DoCast(me, SPELL_IMAGE_EXPLOSION);
         }
 
         void DoAction(int32 action) override
@@ -620,14 +618,13 @@ public:
         void DamageTaken(Unit* /*attacker*/, uint32 &damage) override
         {
             // Because only one image explodes, others become passive
-            if (me->GetReactState() != REACT_AGGRESSIVE)
+            if (me->GetReactState() != REACT_AGGRESSIVE || me->GetHealth() > damage)
                 return;
 
-            if (me->GetHealth() <= damage)
-            {
-                damage = me->GetHealth() - 1;
-                DoCast(me, SPELL_IMAGE_EXPLOSION);
-            }
+            me->SetReactState(REACT_PASSIVE);
+
+            damage = me->GetHealth() - 1;
+            DoCast(me, SPELL_IMAGE_EXPLOSION);
         }
 
         void DoAction(int32 action) override
@@ -727,9 +724,9 @@ public:
             uint32 phase = instance->GetData(DATA_ISISET_PHASE);
             if (phase == 1)
                 GetCaster()->CastSpell(GetCaster(), SPELL_ASTRAL_RAIN_1, true);
-            if (phase == 2)
+            else if (phase == 2)
                 GetCaster()->CastSpell(GetCaster(), SPELL_ASTRAL_RAIN_2, true);
-            if (phase == 3)
+            else if (phase == 3)
                 GetCaster()->CastSpell(GetCaster(), SPELL_ASTRAL_RAIN_3, true);
         }
 
@@ -769,9 +766,9 @@ public:
             uint32 phase = instance->GetData(DATA_ISISET_PHASE);
             if (phase == 1)
                 GetCaster()->CastSpell(GetCaster(), SPELL_VEIL_OF_SKY_1, false);
-            if (phase == 2)
+            else if (phase == 2)
                 GetCaster()->CastSpell(GetCaster(), SPELL_VEIL_OF_SKY_2, false);
-            if (phase == 3)
+            else if (phase == 3)
                 GetCaster()->CastSpell(GetCaster(), SPELL_VEIL_OF_SKY_3, false);
         }
 
@@ -811,9 +808,9 @@ public:
             uint32 phase = instance->GetData(DATA_ISISET_PHASE);
             if (phase == 1)
                 GetCaster()->CastSpell(GetCaster(), SPELL_CELESTIAL_CALL_1, true);
-            if (phase == 2)
+            else if (phase == 2)
                 GetCaster()->CastSpell(GetCaster(), SPELL_CELESTIAL_CALL_2, true);
-            if (phase == 3)
+            else if (phase == 3)
                 GetCaster()->CastSpell(GetCaster(), SPELL_CELESTIAL_CALL_3, true);
         }
 
