@@ -836,12 +836,6 @@ public:
     {
         PrepareAuraScript(spell_isiset_veil_of_sky_AuraScript);
 
-    public:
-        spell_isiset_veil_of_sky_AuraScript()
-        {
-            reflectPct = 0;
-        }
-
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
             return ValidateSpellInfo({ SPELL_VEIL_OF_SKY_DAMAGE });
@@ -849,11 +843,11 @@ public:
 
         bool Load() override
         {
-            reflectPct = GetSpellInfo()->GetEffect(EFFECT_1)->CalcValue(GetCaster());
+            reflectPct = GetSpellInfo()->GetEffect(EFFECT_1)->BasePoints;
             return true;
         }
 
-        void Trigger(AuraEffect* aurEff, DamageInfo & dmgInfo, uint32 & /*absorbAmount*/)
+        void Trigger(AuraEffect* aurEff, DamageInfo& dmgInfo, uint32& /*absorbAmount*/)
         {
             if (dmgInfo.GetDamageType() != SPELL_DIRECT_DAMAGE)
                 return;
@@ -864,7 +858,8 @@ public:
 
         void Register() override
         {
-            AfterEffectAbsorb += AuraEffectAbsorbFn(spell_isiset_veil_of_sky_AuraScript::Trigger, EFFECT_0);
+            // This hook won't work (operator += doesnt match operand AfterEffectManaShield). :-(
+            //AfterEffectManaShield += AuraEffectAbsorbFn(spell_isiset_veil_of_sky_AuraScript::Trigger, EFFECT_0);
         }
 
     private:
@@ -877,21 +872,6 @@ public:
     }
 };
 
-// Check for Supernova spells - targets facing boss are affected
-class IsObjectNotFacingCasterCheck
-{
-    public:
-        IsObjectNotFacingCasterCheck(Unit* caster) : caster(caster) { }
-
-        bool operator()(WorldObject* object)
-        {
-            return (!object->ToUnit()->IsCharmedOwnedByPlayerOrPlayer() || !object->isInFront(caster, 2.5f));
-        }
-        
-    private:
-        Unit* caster;
-};
-
 // 74137 - Supernova (disorient + triggers 76670) (are pets also affected?)
 class spell_isiset_supernova_disorient : public SpellScriptLoader
 {
@@ -902,9 +882,10 @@ public:
     {
         PrepareSpellScript(spell_isiset_supernova_disorient_SpellScript);
 
-        void FilterTargets(std::list<WorldObject*>& unitList)
+        void FilterTargets(std::list<WorldObject*>& targets)
         {
-            unitList.remove_if(IsObjectNotFacingCasterCheck(GetCaster()));
+            Unit* caster = GetCaster();
+            targets.remove_if([caster](WorldObject* object) { return !object->ToUnit() || !object->ToUnit()->IsCharmedOwnedByPlayerOrPlayer() || !object->isInFront(caster, 2.5f); });
         }
 
         void Register() override
@@ -929,9 +910,10 @@ public:
     {
         PrepareSpellScript(spell_isiset_supernova_damage_SpellScript);
 
-        void FilterTargets(std::list<WorldObject*>& unitList)
+        void FilterTargets(std::list<WorldObject*>& targets)
         {
-            unitList.remove_if(IsObjectNotFacingCasterCheck(GetCaster()));
+            Unit* caster = GetCaster();
+            targets.remove_if([caster](WorldObject* object) { return !object->ToUnit() || !object->ToUnit()->IsCharmedOwnedByPlayerOrPlayer() || !object->isInFront(caster, 2.5f); });
         }
 
         void Register() override

@@ -35,9 +35,6 @@ enum Spells
     SPELL_ENERGY_FLUX_SPAWN_TRIGGER = 82377, // Casts SPELL_ENERGY_FLUX_VISUAL on nearby entry (Spatial Flux)
     //SPELL_ENERGY_FLUX_VISUAL = 74043, // Beam visual
     SPELL_ENERGY_FLUX_PERIODIC = 74044,
-    SPELL_ARCANE_FORM_DUMMY = 74869, // Visual
-    SPELL_ARCANE_ENERGY_PERIODIC = 74880,
-    SPELL_ARCANE_ENERGY_ENERGIZE = 74881,
     SPELL_ARCANE_BURST = 74888, // On retail not working? Should probably be cast at full energy.
 };
 
@@ -132,6 +129,9 @@ public:
         return new spell_hoo_energy_flux_SpellScript();
     }
 };
+
+// 74881 - Arcane Energy Energize
+
 
 void AddSC_halls_of_origination()
 {
