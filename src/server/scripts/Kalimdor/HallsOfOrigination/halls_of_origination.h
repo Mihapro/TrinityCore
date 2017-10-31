@@ -52,6 +52,12 @@ enum HOOData
     DATA_BRANN_0_GUID,
     DATA_DEAD_ELEMENTALS,
     DATA_ANRAPHET_GUID,
+
+    // Isiset
+    DATA_ISISET_PHASE,
+    DATA_ISISET_ASTRAL_RAIN_ALIVE,
+    DATA_ISISET_CELESTIAL_CALL_ALIVE,
+    DATA_ISISET_VEIL_OF_SKY_ALIVE,
 };
 
 enum HOOCreatures
@@ -76,6 +82,14 @@ enum HOOCreatures
 
     NPC_BRANN_BRONZEBEARD_0         = 39908,
     NPC_OMEGA_STANCE                = 41194,
+
+    // Isiset trash
+    NPC_SPATIAL_FLUX                = 39612,
+    NPC_SPATIAL_ANOMALY             = 40170,
+    NPC_FLUX_ANIMATOR               = 40033,
+    NPC_STAR_SHARD                  = 40106,
+
+    BOSS_ISISET                     = 39587,
 };
 
 enum HOOGameObjects
@@ -106,6 +120,7 @@ enum HOOMisc
     AREA_TOMB_OF_THE_EARTHRAGER     = 4945,
     ACHIEV_VAULT_OF_LIGHTS_EVENT    = 24212, // Faster Than The Speed Of Light
     SPELL_VAULT_OF_LIGHTS_CREDIT    = 94067, // Not in DBC
+    SPELL_ZERO_ENERGY_NO_REGEN_AURA = 72242, // Zero Energy + Zero Regen (used by some npcs in HoO)
 };
 
 enum HOOGlobalActions
