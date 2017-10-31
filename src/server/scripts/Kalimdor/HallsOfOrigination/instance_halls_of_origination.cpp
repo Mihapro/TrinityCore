@@ -227,7 +227,7 @@ class instance_halls_of_origination : public InstanceMapScript
                         uint32 data = creature->GetEntry() - WARDEN_ENTRY_DATA_DELTA;
                         SetBossState(data, IN_PROGRESS); // Needs to be set to IN_PROGRESS or else the gameobjects state won't be updated
                         SetBossState(data, DONE);
-                        _deadElementals += 1;
+                        ++_deadElementals;
                         if (Creature* brann = instance->GetCreature(BrannBronzebeardGUID))
                             brann->AI()->DoAction(ACTION_ELEMENTAL_DIED);
                         break;
@@ -260,6 +260,14 @@ class instance_halls_of_origination : public InstanceMapScript
             void ReadSaveDataMore(std::istringstream& data) override
             {
                 data >> _deadElementals;
+
+                if (_deadElementals == 4)
+                {
+                    if (GameObject* mirror = instance->GetGameObject(SunMirrorGUID))
+                        mirror->SetGoState(GO_STATE_ACTIVE);
+                    if (GameObject* door = instance->GetGameObject(AnraphetDoorGUID))
+                        door->SetGoState(GO_STATE_ACTIVE);
+                }
             }
 
         protected:

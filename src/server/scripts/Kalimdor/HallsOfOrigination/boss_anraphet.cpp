@@ -58,28 +58,29 @@ enum Gossip
 
 enum Events
 {
-    EVENT_BRANN_IDLE_EMOTE          = 1,
-    EVENT_BRANN_START_INTRO         = 2,
-    EVENT_BRANN_MOVE_INTRO          = 3,
-    EVENT_BRANN_UNLOCK_DOOR         = 4,
-    EVENT_BRANN_THINK               = 5,
-    EVENT_BRANN_SET_ORIENTATION_1   = 6,
-    EVENT_BRANN_SET_ORIENTATION_2   = 7,
-    EVENT_BRANN_SET_ORIENTATION_3   = 8,
-    EVENT_BRANN_SAY_ELEMENTALS      = 9,
-    EVENT_BRANN_SAY_GET_IT          = 10,
-    EVENT_BRANN_4_ELEMENTAL_DEAD    = 11,
-    EVENT_BRANN_SET_ORIENTATION_4   = 12,
+    EVENT_BRANN_IDLE_EMOTE            = 1,
+    EVENT_BRANN_START_INTRO           = 2,
+    EVENT_BRANN_MOVE_INTRO            = 3,
+    EVENT_BRANN_UNLOCK_DOOR           = 4,
+    EVENT_BRANN_THINK                 = 5,
+    EVENT_BRANN_SET_ORIENTATION_1     = 6,
+    EVENT_BRANN_SET_ORIENTATION_2     = 7,
+    EVENT_BRANN_SET_ORIENTATION_3     = 8,
+    EVENT_BRANN_SAY_ELEMENTALS        = 9,
+    EVENT_BRANN_SAY_GET_IT            = 10,
+    EVENT_BRANN_4_ELEMENTAL_DEAD_SAY  = 11,
+    EVENT_BRANN_4_ELEMENTAL_DEAD_DOOR = 12,
+    EVENT_BRANN_SET_ORIENTATION_4     = 13,
 
-    EVENT_ANRAPHET_APPEAR           = 13,
-    EVENT_ANRAPHET_ACTIVATE         = 14,
-    EVENT_ANRAPHET_DESTROY          = 15,
-    EVENT_ANRAPHET_READY            = 16,
-    EVENT_ANRAPHET_NEMESIS_STRIKE   = 17,
-    EVENT_ANRAPHET_ALPHA_BEAMS      = 18,
-    EVENT_ANRAPHET_OMEGA_STANCE     = 19,
-    EVENT_ANRAPHET_CRUMBLING_RUIN   = 20,
-    EVENT_ANRAPHET_ACTIVATE_OMEGA   = 21
+    EVENT_ANRAPHET_APPEAR             = 14,
+    EVENT_ANRAPHET_ACTIVATE           = 15,
+    EVENT_ANRAPHET_DESTROY            = 16,
+    EVENT_ANRAPHET_READY              = 17,
+    EVENT_ANRAPHET_NEMESIS_STRIKE     = 18,
+    EVENT_ANRAPHET_ALPHA_BEAMS        = 19,
+    EVENT_ANRAPHET_OMEGA_STANCE       = 20,
+    EVENT_ANRAPHET_CRUMBLING_RUIN     = 21,
+    EVENT_ANRAPHET_ACTIVATE_OMEGA     = 22
 };
 
 enum Spells
@@ -382,7 +383,8 @@ class npc_brann_bronzebeard_anraphet : public CreatureScript
                             Talk(BRANN_1_ELEMENTAL_DEAD + dead - 1);
                         else
                         {
-                            events.ScheduleEvent(EVENT_BRANN_4_ELEMENTAL_DEAD, 8800);
+                            events.ScheduleEvent(EVENT_BRANN_4_ELEMENTAL_DEAD_DOOR, 8800);
+                            events.ScheduleEvent(EVENT_BRANN_4_ELEMENTAL_DEAD_SAY, 13500);
                             _instance->DoCastSpellOnPlayers(SPELL_VAULT_OF_LIGHTS_CREDIT);
                         }
                         break;
@@ -445,12 +447,14 @@ class npc_brann_bronzebeard_anraphet : public CreatureScript
                             Talk(BRANN_SAY_GET_IT);
                             me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
                             break;
-                        case EVENT_BRANN_4_ELEMENTAL_DEAD:
-                            Talk(BRANN_4_ELEMENTAL_DEAD);
+                        case EVENT_BRANN_4_ELEMENTAL_DEAD_DOOR:
                             if (GameObject* mirror = ObjectAccessor::GetGameObject(*me, _instance->GetGuidData(DATA_ANRAPHET_SUN_MIRROR)))
                                 mirror->SetGoState(GO_STATE_ACTIVE);
                             if (GameObject* door = ObjectAccessor::GetGameObject(*me, _instance->GetGuidData(DATA_ANRAPHET_DOOR)))
                                 door->SetGoState(GO_STATE_ACTIVE);
+                            break;
+                        case EVENT_BRANN_4_ELEMENTAL_DEAD_SAY:
+                            Talk(BRANN_4_ELEMENTAL_DEAD);
                             if (Creature* anraphet = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_ANRAPHET_GUID)))
                                 anraphet->AI()->DoAction(ACTION_ANRAPHET_INTRO);
                             break;
