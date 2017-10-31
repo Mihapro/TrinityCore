@@ -9,7 +9,7 @@ UPDATE `creature_template` SET `ScriptName` = 'npc_celestial_call' WHERE `entry`
 UPDATE `creature_template` SET `ScriptName` = 'npc_veil_of_sky' WHERE `entry` = 39722;
 UPDATE `creature_template` SET `InhabitType` = 12 WHERE `entry` = 39612;
 UPDATE `creature_template` SET `ScriptName` = 'npc_energy_flux' WHERE `entry` = 44015;
-UPDATE `creature_template` SET `ScriptName` = 'npc_spatial_anomaly' WHERE `entry` = 40170;
+UPDATE `creature_template` SET `ScriptName` = 'npc_spatial_anomaly', `flags_extra` = 131072 WHERE `entry` = 40170;
 
 DELETE FROM `spell_script_names` WHERE `ScriptName` IN ('spell_isiset_veil_of_sky', 'spell_isiset_supernova_disorient', 'spell_isiset_supernova_damage', 'spell_isiset_mirror_image_starry_sky_spawner', 'spell_isiset_mirror_image_spawner', 'spell_isiset_image_explosion', 'spell_isiset_astral_rain_controller', 'spell_isiset_mana_shield_controller', 'spell_isiset_astral_familiar_controller', 'spell_hoo_energy_flux');
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
