@@ -11,7 +11,7 @@ UPDATE `creature_template` SET `InhabitType` = 12 WHERE `entry` = 39612;
 UPDATE `creature_template` SET `ScriptName` = 'npc_energy_flux' WHERE `entry` = 44015;
 UPDATE `creature_template` SET `ScriptName` = 'npc_spatial_anomaly' WHERE `entry` = 40170;
 
-DELETE FROM `spell_script_names` WHERE `spell_id` IN (74133, 74372, 74373, 74137, 76670, 69941, 74264, 74301, 74381, 74382, 74383, 82382);
+DELETE FROM `spell_script_names` WHERE `ScriptName` IN ('spell_isiset_veil_of_sky', 'spell_isiset_supernova_disorient', 'spell_isiset_supernova_damage', 'spell_isiset_mirror_image_starry_sky_spawner', 'spell_isiset_mirror_image_spawner', 'spell_isiset_image_explosion', 'spell_isiset_astral_rain_controller', 'spell_isiset_mana_shield_controller', 'spell_isiset_astral_familiar_controller', 'spell_hoo_energy_flux');
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (74133, 'spell_isiset_veil_of_sky'),
 (74372, 'spell_isiset_veil_of_sky'),
