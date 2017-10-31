@@ -198,6 +198,10 @@ class instance_halls_of_origination : public InstanceMapScript
                         return TempleGuardianAnhuurGUID;
                     case DATA_BRANN_0_GUID:
                         return BrannBronzebeardGUID;
+                    case DATA_ANRAPHET_SUN_MIRROR:
+                         return SunMirrorGUID;
+                    case DATA_ANRAPHET_DOOR:
+                        return AnraphetDoorGUID;
                     case DATA_ANRAPHET_GUID:
                         return AnraphetGUID;
                     case DATA_ISISET:
@@ -205,18 +209,6 @@ class instance_halls_of_origination : public InstanceMapScript
                 }
 
                 return ObjectGuid::Empty;
-            }
-
-            void IncreaseDeadElementals(uint32 inc)
-            {
-                _deadElementals += inc;
-                if (_deadElementals == 4)
-                {
-                    if (GameObject* mirror = instance->GetGameObject(SunMirrorGUID))
-                        mirror->SetGoState(GO_STATE_ACTIVE);
-                    if (GameObject* door = instance->GetGameObject(AnraphetDoorGUID))
-                        door->SetGoState(GO_STATE_ACTIVE);
-                }
             }
 
             void OnUnitDeath(Unit* unit) override
@@ -235,7 +227,7 @@ class instance_halls_of_origination : public InstanceMapScript
                         uint32 data = creature->GetEntry() - WARDEN_ENTRY_DATA_DELTA;
                         SetBossState(data, IN_PROGRESS); // Needs to be set to IN_PROGRESS or else the gameobjects state won't be updated
                         SetBossState(data, DONE);
-                        IncreaseDeadElementals(1);
+                        _deadElementals += 1;
                         if (Creature* brann = instance->GetCreature(BrannBronzebeardGUID))
                             brann->AI()->DoAction(ACTION_ELEMENTAL_DIED);
                         break;
@@ -267,9 +259,7 @@ class instance_halls_of_origination : public InstanceMapScript
 
             void ReadSaveDataMore(std::istringstream& data) override
             {
-                uint32 deadElementals;
-                data >> deadElementals;
-                IncreaseDeadElementals(deadElementals);
+                data >> _deadElementals;
             }
 
         protected:

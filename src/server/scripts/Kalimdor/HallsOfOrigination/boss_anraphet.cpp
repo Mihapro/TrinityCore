@@ -24,6 +24,7 @@
 #include "ObjectAccessor.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
+#include "ScriptedGossip.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
 
@@ -50,27 +51,35 @@ enum Texts
     BRANN_SAY_MOMENT                = 12 // Here we go! Now this should only take a moment...
 };
 
+enum Gossip
+{
+    GOSSIP_MENU_WE_ARE_READY = 11339,
+};
+
 enum Events
 {
-    EVENT_BRANN_MOVE_INTRO          = 1,
-    EVENT_BRANN_UNLOCK_DOOR         = 2,
-    EVENT_BRANN_THINK               = 3,
-    EVENT_BRANN_SET_ORIENTATION_1   = 4,
-    EVENT_BRANN_SET_ORIENTATION_2   = 5,
-    EVENT_BRANN_SET_ORIENTATION_3   = 6,
-    EVENT_BRANN_SAY_ELEMENTALS      = 7,
-    EVENT_BRANN_SAY_GET_IT          = 8,
-    EVENT_BRANN_SET_ORIENTATION_4   = 9,
+    EVENT_BRANN_IDLE_EMOTE          = 1,
+    EVENT_BRANN_START_INTRO         = 2,
+    EVENT_BRANN_MOVE_INTRO          = 3,
+    EVENT_BRANN_UNLOCK_DOOR         = 4,
+    EVENT_BRANN_THINK               = 5,
+    EVENT_BRANN_SET_ORIENTATION_1   = 6,
+    EVENT_BRANN_SET_ORIENTATION_2   = 7,
+    EVENT_BRANN_SET_ORIENTATION_3   = 8,
+    EVENT_BRANN_SAY_ELEMENTALS      = 9,
+    EVENT_BRANN_SAY_GET_IT          = 10,
+    EVENT_BRANN_4_ELEMENTAL_DEAD    = 11,
+    EVENT_BRANN_SET_ORIENTATION_4   = 12,
 
-    EVENT_ANRAPHET_APPEAR           = 10,
-    EVENT_ANRAPHET_ACTIVATE         = 11,
-    EVENT_ANRAPHET_DESTROY          = 12,
-    EVENT_ANRAPHET_READY            = 13,
-    EVENT_ANRAPHET_NEMESIS_STRIKE   = 14,
-    EVENT_ANRAPHET_ALPHA_BEAMS      = 15,
-    EVENT_ANRAPHET_OMEGA_STANCE     = 16,
-    EVENT_ANRAPHET_CRUMBLING_RUIN   = 17,
-    EVENT_ANRAPHET_ACTIVATE_OMEGA   = 18
+    EVENT_ANRAPHET_APPEAR           = 13,
+    EVENT_ANRAPHET_ACTIVATE         = 14,
+    EVENT_ANRAPHET_DESTROY          = 15,
+    EVENT_ANRAPHET_READY            = 16,
+    EVENT_ANRAPHET_NEMESIS_STRIKE   = 17,
+    EVENT_ANRAPHET_ALPHA_BEAMS      = 18,
+    EVENT_ANRAPHET_OMEGA_STANCE     = 19,
+    EVENT_ANRAPHET_CRUMBLING_RUIN   = 20,
+    EVENT_ANRAPHET_ACTIVATE_OMEGA   = 21
 };
 
 enum Spells
@@ -327,24 +336,37 @@ class npc_brann_bronzebeard_anraphet : public CreatureScript
     public:
         npc_brann_bronzebeard_anraphet() : CreatureScript("npc_brann_bronzebeard_anraphet") { }
 
+        bool OnGossipHello(Player* player, Creature* creature) override
+        {
+            InstanceScript* instance = creature->GetInstanceScript();
+            if (!instance || instance->GetBossState(DATA_VAULT_OF_LIGHTS) == DONE)
+                return false;
+
+            player->PrepareGossipMenu(creature, GOSSIP_MENU_WE_ARE_READY, true);
+            player->SendPreparedGossip(creature);
+            return true;
+        }
+
         struct npc_brann_bronzebeard_anraphetAI : public CreatureAI
         {
-            npc_brann_bronzebeard_anraphetAI(Creature* creature) : CreatureAI(creature), _currentPoint(0), _instance(creature->GetInstanceScript()) { }
+            npc_brann_bronzebeard_anraphetAI(Creature* creature) : CreatureAI(creature), _currentPoint(0), _instance(creature->GetInstanceScript())
+            {
+                events.ScheduleEvent(EVENT_BRANN_IDLE_EMOTE, 45000);
+            }
 
-            void sGossipSelect(Player* /*player*/, uint32 sender, uint32 action) override
+            void sGossipSelect(Player* /*player*/, uint32 menuId, uint32 /*gossipListId*/) override
             {
                 if (_instance->GetBossState(DATA_VAULT_OF_LIGHTS) == DONE)
                     return;
 
-                if (me->GetCreatureTemplate()->GossipMenuId == sender && !action)
+                if (menuId == GOSSIP_MENU_WE_ARE_READY)
                 {
                     _instance->SetBossState(DATA_VAULT_OF_LIGHTS, IN_PROGRESS);
                     _currentPoint = 0;
                     events.Reset();
                     me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
                     me->SetWalk(true);
-                    Talk(BRANN_SAY_DOOR_INTRO);
-                    events.ScheduleEvent(EVENT_BRANN_UNLOCK_DOOR, 7500);
+                    events.ScheduleEvent(EVENT_BRANN_START_INTRO, 1000);
                 }
             }
 
@@ -355,12 +377,13 @@ class npc_brann_bronzebeard_anraphet : public CreatureScript
                     case ACTION_ELEMENTAL_DIED:
                     {
                         uint32 dead = _instance->GetData(DATA_DEAD_ELEMENTALS);
-                        Talk(BRANN_1_ELEMENTAL_DEAD + dead - 1);
-                        if (dead == 4)
+                        
+                        if (dead < 4)
+                            Talk(BRANN_1_ELEMENTAL_DEAD + dead - 1);
+                        else
                         {
+                            events.ScheduleEvent(EVENT_BRANN_4_ELEMENTAL_DEAD, 8800);
                             _instance->DoCastSpellOnPlayers(SPELL_VAULT_OF_LIGHTS_CREDIT);
-                            if (Creature* anraphet = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_ANRAPHET_GUID)))
-                                anraphet->AI()->DoAction(ACTION_ANRAPHET_INTRO);
                         }
                         break;
                     }
@@ -379,6 +402,14 @@ class npc_brann_bronzebeard_anraphet : public CreatureScript
                 {
                     switch (eventId)
                     {
+                        case EVENT_BRANN_IDLE_EMOTE:
+                            me->HandleEmoteCommand(EMOTE_ONESHOT_USE_STANDING);
+                            events.ScheduleEvent(EVENT_BRANN_IDLE_EMOTE, 45000);
+                            break;
+                        case EVENT_BRANN_START_INTRO:
+                            Talk(BRANN_SAY_DOOR_INTRO);
+                            events.ScheduleEvent(EVENT_BRANN_UNLOCK_DOOR, 7500);
+                            break;
                         case EVENT_BRANN_MOVE_INTRO:
                             if (_currentPoint < MAX_BRANN_WAYPOINTS_INTRO)
                                 me->GetMotionMaster()->MovePoint(_currentPoint, BrannIntroWaypoint[_currentPoint]);
@@ -413,6 +444,15 @@ class npc_brann_bronzebeard_anraphet : public CreatureScript
                         case EVENT_BRANN_SAY_GET_IT:
                             Talk(BRANN_SAY_GET_IT);
                             me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                            break;
+                        case EVENT_BRANN_4_ELEMENTAL_DEAD:
+                            Talk(BRANN_4_ELEMENTAL_DEAD);
+                            if (GameObject* mirror = ObjectAccessor::GetGameObject(*me, _instance->GetGuidData(DATA_ANRAPHET_SUN_MIRROR)))
+                                mirror->SetGoState(GO_STATE_ACTIVE);
+                            if (GameObject* door = ObjectAccessor::GetGameObject(*me, _instance->GetGuidData(DATA_ANRAPHET_DOOR)))
+                                door->SetGoState(GO_STATE_ACTIVE);
+                            if (Creature* anraphet = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_ANRAPHET_GUID)))
+                                anraphet->AI()->DoAction(ACTION_ANRAPHET_INTRO);
                             break;
                         case EVENT_BRANN_SET_ORIENTATION_4:
                             me->SetFacingTo(3.141593f);
