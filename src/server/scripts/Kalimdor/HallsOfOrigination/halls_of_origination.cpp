@@ -30,12 +30,12 @@ enum Spells
 {
     // Isiset trash
     // 90735 use? 82383 muddy aura
-    //SPELL_ENERGY_FLUX = 82382,
-    SPELL_SUMMON_ENERGY_FLUX = 82385,
-    SPELL_ENERGY_FLUX_SPAWN_TRIGGER = 82377, // Casts SPELL_ENERGY_FLUX_VISUAL on nearby entry (Spatial Flux)
-    //SPELL_ENERGY_FLUX_VISUAL = 74043, // Beam visual
-    SPELL_ENERGY_FLUX_PERIODIC = 74044,
-    SPELL_ARCANE_BURST = 74888, // On retail not working? Should probably be cast at full energy.
+    //SPELL_ENERGY_FLUX                 = 82382,
+    SPELL_SUMMON_ENERGY_FLUX            = 82385,
+    SPELL_ENERGY_FLUX_SPAWN_TRIGGER     = 82377, // Casts SPELL_ENERGY_FLUX_VISUAL on nearby entry (Spatial Flux)
+    //SPELL_ENERGY_FLUX_VISUAL          = 74043, // Beam visual
+    SPELL_ENERGY_FLUX_PERIODIC          = 74044,
+    SPELL_ARCANE_BURST                  = 74888, // On retail not working? Should probably be cast at full energy.
 };
 
 enum Events
@@ -54,8 +54,8 @@ public:
     {
         npc_energy_fluxAI(Creature* creature) : ScriptedAI(creature)
         {
-            DoCast(me, SPELL_ENERGY_FLUX_SPAWN_TRIGGER);
-            DoCast(me, SPELL_ENERGY_FLUX_PERIODIC);
+            DoCastSelf(SPELL_ENERGY_FLUX_SPAWN_TRIGGER);
+            DoCastSelf(SPELL_ENERGY_FLUX_PERIODIC);
             me->DespawnOrUnsummon(6400);
         }
 
@@ -104,7 +104,7 @@ public:
 };
 
 // 74880 - Arcane Energy
-class spell_hoo_arcane_energy_check : public SpellScriptLoader     // 64148
+class spell_hoo_arcane_energy_check : public SpellScriptLoader
 {
 public:
     spell_hoo_arcane_energy_check() : SpellScriptLoader("spell_arcane_energy_check") { }

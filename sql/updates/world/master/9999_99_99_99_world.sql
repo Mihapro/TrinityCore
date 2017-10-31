@@ -14,13 +14,13 @@ UPDATE `creature_template` SET `InhabitType` = 12 WHERE `entry` = 39612;
 -- Spatial Anomaly cannot critically hit
 UPDATE `creature_template` SET `flags_extra` = `flags_extra` | 131072 WHERE `entry` = 40170;
 
-DELETE FROM `spell_script_names` WHERE `ScriptName` IN ('spell_isiset_veil_of_sky', 'spell_isiset_supernova_disorient', 'spell_isiset_supernova_damage', 'spell_isiset_mirror_image_starry_sky_spawner', 'spell_isiset_mirror_image_spawner', 'spell_isiset_image_explosion', 'spell_isiset_astral_rain_controller', 'spell_isiset_mana_shield_controller', 'spell_isiset_astral_familiar_controller', 'spell_hoo_energy_flux', 'spell_hoo_arcane_energy_check');
+DELETE FROM `spell_script_names` WHERE `ScriptName` IN ('spell_isiset_veil_of_sky', 'spell_isiset_supernova_filter', 'spell_isiset_mirror_image_starry_sky_spawner', 'spell_isiset_mirror_image_spawner', 'spell_isiset_image_explosion', 'spell_isiset_astral_rain_controller', 'spell_isiset_mana_shield_controller', 'spell_isiset_astral_familiar_controller', 'spell_hoo_energy_flux', 'spell_hoo_arcane_energy_check');
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (74133, 'spell_isiset_veil_of_sky'),
 (74372, 'spell_isiset_veil_of_sky'),
 (74373, 'spell_isiset_veil_of_sky'),
-(74137, 'spell_isiset_supernova_disorient'),
-(76670, 'spell_isiset_supernova_damage'),
+(74137, 'spell_isiset_supernova_filter'),
+(76670, 'spell_isiset_supernova_filter'),
 (69941, 'spell_isiset_mirror_image_starry_sky_spawner'),
 (74264, 'spell_isiset_mirror_image_spawner'),
 (74301, 'spell_isiset_image_explosion'),

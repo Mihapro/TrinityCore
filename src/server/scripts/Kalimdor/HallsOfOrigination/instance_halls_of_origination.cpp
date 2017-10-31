@@ -38,7 +38,7 @@ DoorData const doorData[] =
     {GO_DOODAD_ULDUM_LASERBEAMS_03,   DATA_WATER_WARDEN,           DOOR_TYPE_PASSAGE },
     {GO_DOODAD_ULDUM_LIGHTMACHINE_04, DATA_AIR_WARDEN,             DOOR_TYPE_PASSAGE },
     {GO_DOODAD_ULDUM_LASERBEAMS_02,   DATA_AIR_WARDEN,             DOOR_TYPE_PASSAGE },
-    {0,                              0,                            DOOR_TYPE_ROOM   }
+    {0,                               0,                           DOOR_TYPE_ROOM    }
 };
 
 class instance_halls_of_origination : public InstanceMapScript
@@ -87,9 +87,13 @@ class instance_halls_of_origination : public InstanceMapScript
                         break;
                     case GO_SUN_MIRROR:
                         SunMirrorGUID = go->GetGUID();
+                        if (_deadElementals == 4)
+                            go->SetGoState(GO_STATE_ACTIVE);
                         break;
                     case GO_ANRAPHET_DOOR:
                         AnraphetDoorGUID = go->GetGUID();
+                        if (_deadElementals == 4)
+                            go->SetGoState(GO_STATE_ACTIVE);
                         break;
                 }
             }
@@ -146,18 +150,18 @@ class instance_halls_of_origination : public InstanceMapScript
             {
                 switch (data)
                 {
-                case DATA_ISISET_PHASE:
-                    _isisetPhase = value;
-                    break;
-                case DATA_ISISET_ASTRAL_RAIN_ALIVE:
-                    _isisetAstralRainAlive = value;
-                    break;
-                case DATA_ISISET_CELESTIAL_CALL_ALIVE:
-                    _isisetCelestialCallAlive = value;
-                    break;
-                case DATA_ISISET_VEIL_OF_SKY_ALIVE:
-                    _isisetVeilOfSkyAlive = value;
-                    break;
+                    case DATA_ISISET_PHASE:
+                        _isisetPhase = value;
+                        break;
+                    case DATA_ISISET_ASTRAL_RAIN_ALIVE:
+                        _isisetAstralRainAlive = value;
+                        break;
+                    case DATA_ISISET_CELESTIAL_CALL_ALIVE:
+                        _isisetCelestialCallAlive = value;
+                        break;
+                    case DATA_ISISET_VEIL_OF_SKY_ALIVE:
+                        _isisetVeilOfSkyAlive = value;
+                        break;
                 }
             }
 
@@ -260,14 +264,6 @@ class instance_halls_of_origination : public InstanceMapScript
             void ReadSaveDataMore(std::istringstream& data) override
             {
                 data >> _deadElementals;
-
-                if (_deadElementals == 4)
-                {
-                    if (GameObject* mirror = instance->GetGameObject(SunMirrorGUID))
-                        mirror->SetGoState(GO_STATE_ACTIVE);
-                    if (GameObject* door = instance->GetGameObject(AnraphetDoorGUID))
-                        door->SetGoState(GO_STATE_ACTIVE);
-                }
             }
 
         protected:

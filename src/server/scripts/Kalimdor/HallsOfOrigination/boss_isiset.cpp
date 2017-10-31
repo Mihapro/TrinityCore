@@ -28,69 +28,70 @@
 
 enum Spells
 {
-    SPELL_SUPERNOVA = 74136,
+    SPELL_SUPERNOVA                         = 74136,
     SPELL_SUPERNOVA_EFFECT = 74137,
 
     // Startfall / Astral Rain ability
-    SPELL_ASTRAL_RAIN_CONTROLLER = 74381, // Astral Rain Controller Spell  (15-20 sec cd)
-    SPELL_ASTRAL_RAIN_1 = 74134,
-    SPELL_ASTRAL_RAIN_2 = 74365,
-    SPELL_ASTRAL_RAIN_3 = 74371,
+    SPELL_ASTRAL_RAIN_CONTROLLER            = 74381,
+    SPELL_ASTRAL_RAIN_1                     = 74134,
+    SPELL_ASTRAL_RAIN_2                     = 74365,
+    SPELL_ASTRAL_RAIN_3                     = 74371,
 
     // Adds / Celestial Call ability
-    SPELL_ASTRAL_FAMILIAR_CONTROLLER = 74383, // Astral Familiar Controller Spell
-    SPELL_CELESTIAL_CALL_1 = 74362,
-    SPELL_CELESTIAL_CALL_2 = 74355,
-    SPELL_CELESTIAL_CALL_3 = 74364,
+    SPELL_ASTRAL_FAMILIAR_CONTROLLER        = 74383,
+    SPELL_CELESTIAL_CALL_1                  = 74362,
+    SPELL_CELESTIAL_CALL_2                  = 74355,
+    SPELL_CELESTIAL_CALL_3                  = 74364,
 
     // Mana shield / Veil of Sky ability
-    SPELL_MANA_SHIELD_CONTROLLER = 74382, // Mana Shield Controller Spell
-    SPELL_VEIL_OF_SKY_1 = 74133,
-    SPELL_VEIL_OF_SKY_2 = 74372,
-    SPELL_VEIL_OF_SKY_3 = 74373,
-    SPELL_VEIL_OF_SKY_DAMAGE = 79370,
+    SPELL_MANA_SHIELD_CONTROLLER            = 74382,
+    SPELL_VEIL_OF_SKY_1                     = 74133,
+    SPELL_VEIL_OF_SKY_2                     = 74372,
+    SPELL_VEIL_OF_SKY_3                     = 74373,
+    SPELL_VEIL_OF_SKY_DAMAGE                = 79370,
 
     // Mirror Images (at 66% and 33%)
-    SPELL_MIRROR_IMAGE_STARRY_SKY_SPAWNER = 69941,
-    SPELL_MIRROR_IMAGE_STARRY_SKY_N = 69936,
-    SPELL_MIRROR_IMAGE_STARRY_SKY_E = 69939,
-    SPELL_MIRROR_IMAGE_STARRY_SKY_W = 69940,
-    SPELL_ASTRAL_SHIFT = 74312,
-    SPELL_MIRROR_IMAGE_SPAWNER = 74264, // casts 74263, 74262, 74261
-    SPELL_MIRROR_IMAGE_N = 74263,
-    SPELL_MIRROR_IMAGE_E = 74262,
-    SPELL_MIRROR_IMAGE_W = 74261,
-    SPELL_ADDS_STATE_VISUAL = 74289,
-    SPELL_STARFALL_STATE_VISUAL = 74265,
-    SPELL_MANA_SHIELD_STATE_VISUAL = 74266,
-    SPELL_IMAGE_EXPLOSION = 74301,
+    SPELL_MIRROR_IMAGE_STARRY_SKY_SPAWNER   = 69941,
+    SPELL_MIRROR_IMAGE_STARRY_SKY_N         = 69936,
+    SPELL_MIRROR_IMAGE_STARRY_SKY_E         = 69939,
+    SPELL_MIRROR_IMAGE_STARRY_SKY_W         = 69940,
+    SPELL_ASTRAL_SHIFT                      = 74312,
+    SPELL_ASTRAL_SHIFT_EXPLOSION            = 74333,
+    SPELL_MIRROR_IMAGE_SPAWNER              = 74264,
+    SPELL_MIRROR_IMAGE_N                    = 74263,
+    SPELL_MIRROR_IMAGE_E                    = 74262,
+    SPELL_MIRROR_IMAGE_W                    = 74261,
+    SPELL_ADDS_STATE_VISUAL                 = 74289,
+    SPELL_STARFALL_STATE_VISUAL             = 74265,
+    SPELL_MANA_SHIELD_STATE_VISUAL          = 74266,
+    SPELL_IMAGE_EXPLOSION                   = 74301,
 
     // Celestial Familiar npc
-    SPELL_ORB_VISUAL = 74356, // Adds State Visual (orb)
-    SPELL_ARCANE_BARRAGE = 74374,
-
-    // Astral Shift Explosion Visual npc
-    SPELL_ASTRAL_SHIFT_EXPLOSION_VISUAL = 74331,
+    SPELL_ORB_VISUAL                        = 74356, 
+    SPELL_ARCANE_BARRAGE                    = 74374,
 
     // Starry Sky npc
-    SPELL_STARRY_SKY_VISUAL = 74149,
+    SPELL_STARRY_SKY_VISUAL                 = 74149,
+
+    // Astral Shift Explosion Visual npc
+    SPELL_ASTRAL_SHIFT_EXPLOSION_VISUAL     = 74331,
 };
 
 enum NPCs
 {
-    NPC_CELESTIAL_FAMILIAR = 39795,
-    NPC_ASTRAL_RAIN = 39720, // N
-    NPC_CELESTIAL_CALL = 39721, // E
-    NPC_VEIL_OF_SKY = 39722, // W
+    NPC_CELESTIAL_FAMILIAR                  = 39795,
+    NPC_ASTRAL_RAIN                         = 39720, // N
+    NPC_CELESTIAL_CALL                      = 39721, // E
+    NPC_VEIL_OF_SKY                         = 39722, // W
 };
 
 enum Texts
 {
-    SAY_AGGRO = 0,
-    SAY_SUPERNOVA = 1,
-    SAY_SUPERNOVA_WARNING = 2,
-    SAY_PLAYER_DEATH = 3,
-    SAY_DEATH = 4,
+    SAY_AGGRO                               = 0,
+    SAY_SUPERNOVA                           = 1,
+    SAY_SUPERNOVA_WARNING                   = 2,
+    SAY_PLAYER_DEATH                        = 3,
+    SAY_DEATH                               = 4,
 };
 
 enum Events
@@ -171,26 +172,6 @@ public:
                 MirrorImage();
         }
 
-        void JustSummoned(Creature* summoned) override
-        {
-            switch (summoned->GetEntry())
-            {
-            case NPC_ASTRAL_RAIN:
-                instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, summoned, 1);
-                break;
-            case NPC_CELESTIAL_CALL:
-                instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, summoned, 2);
-                break;
-            case NPC_VEIL_OF_SKY:
-                instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, summoned, 3);
-                break;
-            default:
-                break;
-            }
-
-            summons.Summon(summoned);
-        }
-
         void DoAction(int32 action) override
         {
             // We only accept action from the first dying image
@@ -227,46 +208,46 @@ public:
             {
                 switch (eventId)
                 {
-                case EVENT_START_ATTACK:
-                    instance->SendEncounterUnit(ENCOUNTER_FRAME_UPDATE_PRIORITY, me, 1);
-                    me->SetReactState(REACT_AGGRESSIVE);
-                    DoStartMovement(me->GetVictim());
-                    break;
-                case EVENT_ASTRAL_RAIN:
-                    DoCast(me, SPELL_ASTRAL_RAIN_CONTROLLER);
-                    events.ScheduleEvent(EVENT_ASTRAL_RAIN, urand(15,19)*IN_MILLISECONDS);
-                    break;
-                case EVENT_ASTRAL_FAMILIAR:
-                    DoCast(me, SPELL_ASTRAL_FAMILIAR_CONTROLLER);
-                    events.ScheduleEvent(EVENT_ASTRAL_FAMILIAR, urand(26,30)*IN_MILLISECONDS);
-                    break;
-                case EVENT_VEIL_OF_SKY:
-                    DoCast(me, SPELL_MANA_SHIELD_CONTROLLER);
-                    events.ScheduleEvent(EVENT_VEIL_OF_SKY, urand(20,25)*IN_MILLISECONDS);
-                    break;
-                case EVENT_SUPERNOVA:
-                    DoCast(me, SPELL_SUPERNOVA);
-                    Talk(SAY_SUPERNOVA);
-                    Talk(SAY_SUPERNOVA_WARNING);
-                    events.ScheduleEvent(EVENT_SUPERNOVA, urand(45,50)*IN_MILLISECONDS);
-                    break;
-                case EVENT_IMAGES_ATTACK:
-                {
-                    DummyEntryCheckPredicate pred;
-                    summons.DoAction(ACTION_IMAGES_SET_AGGRESSIVE, pred);
-                    break;
-                }
-                case EVENT_DESPAWN_IMAGES:
-                {
-                    DummyEntryCheckPredicate pred;
-                    summons.DoAction(ACTION_IMAGES_DESPAWN, pred);
-                    instance->SetData(DATA_ISISET_PHASE, instance->GetData(DATA_ISISET_PHASE) + 1);
-                    me->RemoveAurasDueToSpell(SPELL_ASTRAL_SHIFT);
-                    RescheduleEvents();
-                    break;
-                }
-                default:
-                    break;
+                    case EVENT_START_ATTACK:
+                        instance->SendEncounterUnit(ENCOUNTER_FRAME_UPDATE_PRIORITY, me, 1);
+                        me->SetReactState(REACT_AGGRESSIVE);
+                        DoStartMovement(me->GetVictim());
+                        break;
+                    case EVENT_ASTRAL_RAIN:
+                        DoCastSelf(SPELL_ASTRAL_RAIN_CONTROLLER);
+                        events.Repeat(Seconds(15), Seconds(19));
+                        break;
+                    case EVENT_ASTRAL_FAMILIAR:
+                        DoCastSelf(SPELL_ASTRAL_FAMILIAR_CONTROLLER);
+                        events.Repeat(Seconds(26), Seconds(30));
+                        break;
+                    case EVENT_VEIL_OF_SKY:
+                        DoCastSelf(SPELL_MANA_SHIELD_CONTROLLER);
+                        events.Repeat(Seconds(20), Seconds(25));
+                        break;
+                    case EVENT_SUPERNOVA:
+                        DoCastSelf(SPELL_SUPERNOVA);
+                        Talk(SAY_SUPERNOVA);
+                        Talk(SAY_SUPERNOVA_WARNING);
+                        events.Repeat(Seconds(45), Seconds(50));
+                        break;
+                    case EVENT_IMAGES_ATTACK:
+                    {
+                        DummyEntryCheckPredicate pred;
+                        summons.DoAction(ACTION_IMAGES_SET_AGGRESSIVE, pred);
+                        break;
+                    }
+                    case EVENT_DESPAWN_IMAGES:
+                    {
+                        DummyEntryCheckPredicate pred;
+                        summons.DoAction(ACTION_IMAGES_DESPAWN, pred);
+                        instance->SetData(DATA_ISISET_PHASE, instance->GetData(DATA_ISISET_PHASE) + 1);
+                        me->RemoveAurasDueToSpell(SPELL_ASTRAL_SHIFT);
+                        RescheduleEvents();
+                        break;
+                    }
+                    default:
+                        break;
                 }
             }
 
@@ -279,12 +260,12 @@ public:
             events.Reset();
             events.ScheduleEvent(EVENT_START_ATTACK, 1200);
             if (instance->GetData(DATA_ISISET_ASTRAL_RAIN_ALIVE) == 1)
-                events.ScheduleEvent(EVENT_ASTRAL_RAIN, urand(4, 6)*IN_MILLISECONDS);
+                events.ScheduleEvent(EVENT_ASTRAL_RAIN, Seconds(4), Seconds(6));
             if (instance->GetData(DATA_ISISET_CELESTIAL_CALL_ALIVE) == 1)
-                events.ScheduleEvent(EVENT_ASTRAL_FAMILIAR, 7200);
+                events.ScheduleEvent(EVENT_ASTRAL_FAMILIAR, Seconds(7));
             if (instance->GetData(DATA_ISISET_VEIL_OF_SKY_ALIVE) == 1)
-                events.ScheduleEvent(EVENT_VEIL_OF_SKY, urand(8, 10)*IN_MILLISECONDS);
-            events.ScheduleEvent(EVENT_SUPERNOVA, urand(12, 17)*IN_MILLISECONDS);
+                events.ScheduleEvent(EVENT_VEIL_OF_SKY, Seconds(8), Seconds(10));
+            events.ScheduleEvent(EVENT_SUPERNOVA, Seconds(12), Seconds(17));
         }
 
         // Mirror Image transition phase
@@ -294,11 +275,12 @@ public:
             instance->SendEncounterUnit(ENCOUNTER_FRAME_UPDATE_PRIORITY, me, 0);
             mirrorImageDied = false;
 
-            DoCast(SPELL_ASTRAL_SHIFT);
-            DoCast(SPELL_MIRROR_IMAGE_STARRY_SKY_SPAWNER);
-            DoCast(SPELL_MIRROR_IMAGE_SPAWNER);
+            DoCastSelf(SPELL_ASTRAL_SHIFT);
+            DoCastSelf(SPELL_ASTRAL_SHIFT_EXPLOSION);
+            DoCastSelf(SPELL_MIRROR_IMAGE_STARRY_SKY_SPAWNER);
+            DoCastSelf(SPELL_MIRROR_IMAGE_SPAWNER);
 
-            events.ScheduleEvent(EVENT_IMAGES_ATTACK, 2000);
+            events.ScheduleEvent(EVENT_IMAGES_ATTACK, Seconds(2));
         }
 
         bool mirrorImageDied;
@@ -323,7 +305,7 @@ public:
             me->SetReactState(REACT_PASSIVE);
             events.ScheduleEvent(EVENT_ORB_ADD_VISUAL, 1200);
             events.ScheduleEvent(EVENT_ORB_SET_AGGRESSIVE, 2400);
-            events.ScheduleEvent(EVENT_ORB_ARCANE_BARRAGE, urand(4,6)*IN_MILLISECONDS);
+            events.ScheduleEvent(EVENT_ORB_ARCANE_BARRAGE, Seconds(urand(4,6)));
         }
 
         void UpdateAI(uint32 diff) override
@@ -337,17 +319,17 @@ public:
             {
                 switch (eventId)
                 {
-                case EVENT_ORB_ADD_VISUAL:
-                    DoCast(me, SPELL_ORB_VISUAL);
-                    break;
-                case EVENT_ORB_SET_AGGRESSIVE:
-                    me->SetReactState(REACT_AGGRESSIVE);
-                    break;
-                case EVENT_ORB_ARCANE_BARRAGE:
-                    DoCast(me, SPELL_ARCANE_BARRAGE);
-                    events.ScheduleEvent(EVENT_ORB_ARCANE_BARRAGE, urand(6,7)*IN_MILLISECONDS);
-                default:
-                    break;
+                    case EVENT_ORB_ADD_VISUAL:
+                        DoCastSelf(SPELL_ORB_VISUAL);
+                        break;
+                    case EVENT_ORB_SET_AGGRESSIVE:
+                        me->SetReactState(REACT_AGGRESSIVE);
+                        break;
+                    case EVENT_ORB_ARCANE_BARRAGE:
+                        DoCastSelf(SPELL_ARCANE_BARRAGE);
+                        events.Repeat(Seconds(6), Seconds(7));
+                    default:
+                        break;
                 }
             }
         }
@@ -372,7 +354,7 @@ public:
     {
         npc_astral_shift_explosion_visualAI(Creature* creature) : ScriptedAI(creature)
         {
-            DoCast(me, SPELL_ASTRAL_SHIFT_EXPLOSION_VISUAL);
+            DoCastSelf(SPELL_ASTRAL_SHIFT_EXPLOSION_VISUAL);
             me->DespawnOrUnsummon(21300);
         }
 
@@ -413,11 +395,11 @@ public:
             {
                 switch (eventId)
                 {
-                case EVENT_STARRY_SKY_ADD_VISUAL:
-                    DoCast(me, SPELL_STARRY_SKY_VISUAL);
-                    break;
-                default:
-                    break;
+                    case EVENT_STARRY_SKY_ADD_VISUAL:
+                        DoCastSelf(SPELL_STARRY_SKY_VISUAL);
+                        break;
+                    default:
+                        break;
                 }
             }
         }
@@ -443,8 +425,9 @@ public:
         npc_astral_rainAI(Creature* creature) : ScriptedAI(creature), _instance(creature->GetInstanceScript())
         {
             me->SetReactState(REACT_PASSIVE);
-            DoCast(me, SPELL_STARFALL_STATE_VISUAL);
-            _events.ScheduleEvent(EVENT_IMAGE_ASTRAL_RAIN, urand(3,5)*IN_MILLISECONDS);
+            _instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me, 1);
+            _events.ScheduleEvent(EVENT_IMAGE_ASTRAL_RAIN, Seconds(3), Seconds(5));
+            DoCastSelf(SPELL_STARFALL_STATE_VISUAL);
         }
 
         void DamageTaken(Unit* /*attacker*/, uint32 &damage) override
@@ -456,26 +439,26 @@ public:
             me->SetReactState(REACT_PASSIVE);
 
             damage = me->GetHealth() - 1;
-            DoCast(me, SPELL_IMAGE_EXPLOSION);
+            DoCastSelf(SPELL_IMAGE_EXPLOSION);
         }
 
         void DoAction(int32 action) override
         {
             switch (action)
             {
-            case ACTION_IMAGES_SET_AGGRESSIVE:
-                me->SetReactState(REACT_AGGRESSIVE);
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
-                    AttackStart(target);
-                break;
-            case ACTION_IMAGES_SET_PASSIVE:
-                me->SetReactState(REACT_PASSIVE);
-                me->AttackStop();
-                break;
-            case ACTION_IMAGES_DESPAWN:
-                _instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
-                me->DespawnOrUnsummon();
-                break;
+                case ACTION_IMAGES_SET_AGGRESSIVE:
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                        AttackStart(target);
+                    break;
+                case ACTION_IMAGES_SET_PASSIVE:
+                    me->SetReactState(REACT_PASSIVE);
+                    me->AttackStop();
+                    break;
+                case ACTION_IMAGES_DESPAWN:
+                    _instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
+                    me->DespawnOrUnsummon();
+                    break;
             }
         }
 
@@ -493,12 +476,12 @@ public:
             {
                 switch (eventId)
                 {
-                case EVENT_IMAGE_ASTRAL_RAIN:
-                    DoCast(me, SPELL_ASTRAL_RAIN_CONTROLLER);
-                    _events.ScheduleEvent(EVENT_IMAGE_ASTRAL_RAIN, urand(16,19)*IN_MILLISECONDS);
-                    break;
-                default:
-                    break;
+                    case EVENT_IMAGE_ASTRAL_RAIN:
+                        DoCastSelf(SPELL_ASTRAL_RAIN_CONTROLLER);
+                        _events.Repeat(Seconds(16), Seconds(19));
+                        break;
+                    default:
+                        break;
                 }
             }
 
@@ -527,8 +510,9 @@ public:
         npc_celestial_callAI(Creature* creature) : ScriptedAI(creature), _instance(creature->GetInstanceScript())
         {
             me->SetReactState(REACT_PASSIVE);
-            DoCast(me, SPELL_ADDS_STATE_VISUAL);
-            _events.ScheduleEvent(EVENT_IMAGE_ARCANE_BARRAGE, 6000);
+            _instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me, 1);
+            _events.ScheduleEvent(EVENT_IMAGE_ARCANE_BARRAGE, Seconds(6));
+            DoCastSelf(SPELL_ADDS_STATE_VISUAL);            
         }
 
         void DamageTaken(Unit* /*attacker*/, uint32 &damage) override
@@ -540,26 +524,26 @@ public:
             me->SetReactState(REACT_PASSIVE);
 
             damage = me->GetHealth() - 1;
-            DoCast(me, SPELL_IMAGE_EXPLOSION);
+            DoCastSelf(SPELL_IMAGE_EXPLOSION);
         }
 
         void DoAction(int32 action) override
         {
             switch (action)
             {
-            case ACTION_IMAGES_SET_AGGRESSIVE:
-                me->SetReactState(REACT_AGGRESSIVE);
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
-                    AttackStart(target);
-                break;
-            case ACTION_IMAGES_SET_PASSIVE:
-                me->SetReactState(REACT_PASSIVE);
-                me->AttackStop();
-                break;
-            case ACTION_IMAGES_DESPAWN:
-                _instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
-                me->DespawnOrUnsummon();
-                break;
+                case ACTION_IMAGES_SET_AGGRESSIVE:
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
+                        AttackStart(target);
+                    break;
+                case ACTION_IMAGES_SET_PASSIVE:
+                    me->SetReactState(REACT_PASSIVE);
+                    me->AttackStop();
+                    break;
+                case ACTION_IMAGES_DESPAWN:
+                    _instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
+                    me->DespawnOrUnsummon();
+                    break;
             }
         }
 
@@ -577,12 +561,12 @@ public:
             {
                 switch (eventId)
                 {
-                case EVENT_IMAGE_ARCANE_BARRAGE:
-                    DoCast(me, SPELL_ARCANE_BARRAGE);
-                    _events.ScheduleEvent(EVENT_IMAGE_ARCANE_BARRAGE, urand(8,10)*IN_MILLISECONDS);
-                    break;
-                default:
-                    break;
+                    case EVENT_IMAGE_ARCANE_BARRAGE:
+                        DoCastSelf(SPELL_ARCANE_BARRAGE);
+                        _events.Repeat(Seconds(8), Seconds(10));
+                        break;
+                    default:
+                        break;
                 }
             }
 
@@ -611,8 +595,10 @@ public:
         npc_veil_of_skyAI(Creature* creature) : ScriptedAI(creature), _instance(creature->GetInstanceScript())
         {
             me->SetReactState(REACT_PASSIVE);
-            //DoCast(me, SPELL_MANA_SHIELD_STATE_VISUAL); // Disabled in sniffs/on retail, too shiny. 
-            _events.ScheduleEvent(EVENT_IMAGE_VEIL_OF_SKY, urand(8000,9000));
+            _instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me, 1);
+            _events.ScheduleEvent(EVENT_IMAGE_VEIL_OF_SKY, Seconds(8),Seconds(9));
+            //DoCastSelf(SPELL_MANA_SHIELD_STATE_VISUAL); // Disabled in sniffs/on retail, too shiny. 
+            
         }
 
         void DamageTaken(Unit* /*attacker*/, uint32 &damage) override
@@ -624,26 +610,26 @@ public:
             me->SetReactState(REACT_PASSIVE);
 
             damage = me->GetHealth() - 1;
-            DoCast(me, SPELL_IMAGE_EXPLOSION);
+            DoCastSelf(SPELL_IMAGE_EXPLOSION);
         }
 
         void DoAction(int32 action) override
         {
             switch (action)
             {
-            case ACTION_IMAGES_SET_AGGRESSIVE:
-                me->SetReactState(REACT_AGGRESSIVE);
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
-                    AttackStart(target);
-                break;
-            case ACTION_IMAGES_SET_PASSIVE:
-                me->SetReactState(REACT_PASSIVE);
-                me->AttackStop();
-                break;
-            case ACTION_IMAGES_DESPAWN:
-                _instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
-                me->DespawnOrUnsummon();
-                break;
+                case ACTION_IMAGES_SET_AGGRESSIVE:
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
+                        AttackStart(target);
+                    break;
+                case ACTION_IMAGES_SET_PASSIVE:
+                    me->SetReactState(REACT_PASSIVE);
+                    me->AttackStop();
+                    break;
+                case ACTION_IMAGES_DESPAWN:
+                    _instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
+                    me->DespawnOrUnsummon();
+                    break;
             }
         }
 
@@ -661,13 +647,13 @@ public:
             {
                 switch (eventId)
                 {
-                case EVENT_IMAGE_VEIL_OF_SKY: 
-                    CastManaShield(); // Does second Veil of Sky npc cast stronger shield?
-                    // Not sure if it should repeat, cooldown copied from Isiset.
-                    _events.ScheduleEvent(EVENT_IMAGE_VEIL_OF_SKY, urand(20000, 25000));
-                    break;
-                default:
-                    break;
+                    case EVENT_IMAGE_VEIL_OF_SKY: 
+                        CastManaShield(); // Does second Veil of Sky npc cast stronger shield?
+                        // Not sure if it should repeat, cooldown copied from Isiset.
+                        _events.Repeat(Seconds(20), Seconds(25));
+                        break;
+                    default:
+                        break;
                 }
             }
 
@@ -681,12 +667,12 @@ public:
         {
             switch (_instance->GetData(DATA_ISISET_PHASE))
             {
-            case 1:
-                DoCast(me, SPELL_VEIL_OF_SKY_1);
-                break;
-            case 2:
-                DoCast(me, SPELL_VEIL_OF_SKY_2);
-                break;
+                case 1:
+                    DoCastSelf(SPELL_VEIL_OF_SKY_1);
+                    break;
+                case 2:
+                    DoCastSelf(SPELL_VEIL_OF_SKY_2);
+                    break;
             }
         }
         
@@ -873,42 +859,15 @@ public:
 };
 
 // 74137 - Supernova (disorient + triggers 76670) (are pets also affected?)
-class spell_isiset_supernova_disorient : public SpellScriptLoader
-{
-public:
-    spell_isiset_supernova_disorient() : SpellScriptLoader("spell_isiset_supernova_disorient") { }
-
-    class spell_isiset_supernova_disorient_SpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_isiset_supernova_disorient_SpellScript);
-
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            Unit* caster = GetCaster();
-            targets.remove_if([caster](WorldObject* object) { return !object->ToUnit() || !object->ToUnit()->IsCharmedOwnedByPlayerOrPlayer() || !object->isInFront(caster, 2.5f); });
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_isiset_supernova_disorient_SpellScript::FilterTargets, EFFECT_1, TARGET_UNIT_SRC_AREA_ENEMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_isiset_supernova_disorient_SpellScript();
-    }
-};
-
 // 76670 - Supernova (damage)
-class spell_isiset_supernova_damage : public SpellScriptLoader
+class spell_isiset_supernova_filter : public SpellScriptLoader
 {
 public:
-    spell_isiset_supernova_damage() : SpellScriptLoader("spell_isiset_supernova_damage") { }
+    spell_isiset_supernova_filter() : SpellScriptLoader("spell_isiset_supernova_filter") { }
 
-    class spell_isiset_supernova_damage_SpellScript : public SpellScript
+    class spell_isiset_supernova_filter_SpellScript : public SpellScript
     {
-        PrepareSpellScript(spell_isiset_supernova_damage_SpellScript);
+        PrepareSpellScript(spell_isiset_supernova_filter_SpellScript);
 
         void FilterTargets(std::list<WorldObject*>& targets)
         {
@@ -918,13 +877,13 @@ public:
 
         void Register() override
         {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_isiset_supernova_damage_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_isiset_supernova_filter_SpellScript::FilterTargets, m_scriptSpellId == SPELL_SUPERNOVA_EFFECT ? EFFECT_1 : EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
         }
     };
 
     SpellScript* GetSpellScript() const override
     {
-        return new spell_isiset_supernova_damage_SpellScript();
+        return new spell_isiset_supernova_filter_SpellScript();
     }
 };
 
@@ -1027,12 +986,18 @@ public:
             if (!instance)
                 return;
 
-            if (GetCaster()->GetEntry() == NPC_ASTRAL_RAIN)
-                instance->SetData(DATA_ISISET_ASTRAL_RAIN_ALIVE, 0);
-            else if (GetCaster()->GetEntry() == NPC_CELESTIAL_CALL)
-                instance->SetData(DATA_ISISET_CELESTIAL_CALL_ALIVE, 0);
-            else if (GetCaster()->GetEntry() == NPC_VEIL_OF_SKY)
-                instance->SetData(DATA_ISISET_VEIL_OF_SKY_ALIVE, 0);
+            switch (GetCaster()->GetEntry())
+            {
+                case NPC_ASTRAL_RAIN:
+                    instance->SetData(DATA_ISISET_ASTRAL_RAIN_ALIVE, 0);
+                    break;
+                case NPC_CELESTIAL_CALL:
+                    instance->SetData(DATA_ISISET_CELESTIAL_CALL_ALIVE, 0);
+                    break;
+                case NPC_VEIL_OF_SKY:
+                    instance->SetData(DATA_ISISET_VEIL_OF_SKY_ALIVE, 0);
+                    break;
+            }
 
             if (Creature* Isiset = ObjectAccessor::GetCreature(*GetCaster(), instance->GetGuidData(DATA_ISISET)))
                 Isiset->AI()->DoAction(ACTION_MIRROR_IMAGE_DIED);
@@ -1063,8 +1028,7 @@ void AddSC_boss_isiset()
     new spell_isiset_mana_shield_controller();
     new spell_isiset_astral_familiar_controller();
     new spell_isiset_veil_of_sky();
-    new spell_isiset_supernova_disorient();
-    new spell_isiset_supernova_damage();
+    new spell_isiset_supernova_filter();
     new spell_isiset_mirror_image_starry_sky_spawner();
     new spell_isiset_mirror_image_spawner();
     new spell_isiset_image_explosion();

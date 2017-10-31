@@ -254,19 +254,19 @@ public:
                         events.ScheduleEvent(EVENT_ANRAPHET_NEMESIS_STRIKE, 21500, 0, PHASE_COMBAT);
                         break;
                     case EVENT_ANRAPHET_ALPHA_BEAMS:
-                        DoCast(me, SPELL_ALPHA_BEAMS);
+                        DoCastSelf(SPELL_ALPHA_BEAMS);
                         events.ScheduleEvent(EVENT_ANRAPHET_CRUMBLING_RUIN, 12500, 0, PHASE_COMBAT);
                         events.ScheduleEvent(EVENT_ANRAPHET_ALPHA_BEAMS, urand(40000, 45000), 0, PHASE_COMBAT);
                         break;
                     case EVENT_ANRAPHET_OMEGA_STANCE:
-                        DoCast(me, SPELL_OMEGA_STANCE_SUMMON);
-                        DoCast(me, SPELL_OMEGA_STANCE);
+                        DoCastSelf(SPELL_OMEGA_STANCE_SUMMON);
+                        DoCastSelf(SPELL_OMEGA_STANCE);
                         Talk(ANRAPHET_SAY_OMEGA_STANCE);
                         events.ScheduleEvent(EVENT_ANRAPHET_OMEGA_STANCE, urand(45000, 50000), 0, PHASE_COMBAT);
                         events.ScheduleEvent(EVENT_ANRAPHET_CRUMBLING_RUIN, 13000, 0, PHASE_COMBAT);
                         break;
                     case EVENT_ANRAPHET_CRUMBLING_RUIN:
-                        DoCast(me, SPELL_CRUMBLING_RUIN);
+                        DoCastSelf(SPELL_CRUMBLING_RUIN);
                         break;
                 }
             }
@@ -293,7 +293,7 @@ class npc_omega_stance : public CreatureScript
 
             void IsSummonedBy(Unit* /*who*/) override
             {
-                DoCast(me, SPELL_OMEGA_STANCE_SPIDER_TRIGGER, true);
+                DoCastSelf(SPELL_OMEGA_STANCE_SPIDER_TRIGGER, true);
             }
 
             void EnterEvadeMode(EvadeReason /*why*/) override { }
@@ -350,7 +350,9 @@ class npc_brann_bronzebeard_anraphet : public CreatureScript
 
         struct npc_brann_bronzebeard_anraphetAI : public CreatureAI
         {
-            npc_brann_bronzebeard_anraphetAI(Creature* creature) : CreatureAI(creature), _currentPoint(0), _instance(creature->GetInstanceScript())
+            npc_brann_bronzebeard_anraphetAI(Creature* creature) : CreatureAI(creature), _currentPoint(0), _instance(creature->GetInstanceScript()) { }
+
+            void Reset() override
             {
                 events.ScheduleEvent(EVENT_BRANN_IDLE_EMOTE, 45000);
             }
@@ -383,7 +385,7 @@ class npc_brann_bronzebeard_anraphet : public CreatureScript
                             Talk(BRANN_1_ELEMENTAL_DEAD + dead - 1);
                         else
                         {
-                            events.ScheduleEvent(EVENT_BRANN_4_ELEMENTAL_DEAD_DOOR, 8800);
+                            events.ScheduleEvent(EVENT_BRANN_4_ELEMENTAL_DEAD_DOOR, Seconds(9));
                             events.ScheduleEvent(EVENT_BRANN_4_ELEMENTAL_DEAD_SAY, 13500);
                             _instance->DoCastSpellOnPlayers(SPELL_VAULT_OF_LIGHTS_CREDIT);
                         }
@@ -406,7 +408,7 @@ class npc_brann_bronzebeard_anraphet : public CreatureScript
                     {
                         case EVENT_BRANN_IDLE_EMOTE:
                             me->HandleEmoteCommand(EMOTE_ONESHOT_USE_STANDING);
-                            events.ScheduleEvent(EVENT_BRANN_IDLE_EMOTE, 45000);
+                            events.Repeat(Seconds(45));
                             break;
                         case EVENT_BRANN_START_INTRO:
                             Talk(BRANN_SAY_DOOR_INTRO);
@@ -424,7 +426,7 @@ class npc_brann_bronzebeard_anraphet : public CreatureScript
                             break;
                         case EVENT_BRANN_THINK:
                             Talk(BRANN_SAY_THINK);
-                            events.ScheduleEvent(EVENT_BRANN_SET_ORIENTATION_1, 6000);
+                            events.ScheduleEvent(EVENT_BRANN_SET_ORIENTATION_1, Seconds(6));
                             break;
                         case EVENT_BRANN_SET_ORIENTATION_1:
                             me->SetFacingTo(5.445427f);
