@@ -7,11 +7,14 @@ UPDATE `creature_template` SET `ScriptName` = 'npc_starry_sky' WHERE `entry` = 3
 UPDATE `creature_template` SET `ScriptName` = 'npc_astral_rain' WHERE `entry` = 39720;
 UPDATE `creature_template` SET `ScriptName` = 'npc_celestial_call' WHERE `entry` = 39721;
 UPDATE `creature_template` SET `ScriptName` = 'npc_veil_of_sky' WHERE `entry` = 39722;
-UPDATE `creature_template` SET `InhabitType` = 12 WHERE `entry` = 39612;
 UPDATE `creature_template` SET `ScriptName` = 'npc_energy_flux' WHERE `entry` = 44015;
-UPDATE `creature_template` SET `ScriptName` = 'npc_spatial_anomaly', `flags_extra` = `flags_extra` | 131072 WHERE `entry` = 40170;
 
-DELETE FROM `spell_script_names` WHERE `ScriptName` IN ('spell_isiset_veil_of_sky', 'spell_isiset_supernova_disorient', 'spell_isiset_supernova_damage', 'spell_isiset_mirror_image_starry_sky_spawner', 'spell_isiset_mirror_image_spawner', 'spell_isiset_image_explosion', 'spell_isiset_astral_rain_controller', 'spell_isiset_mana_shield_controller', 'spell_isiset_astral_familiar_controller', 'spell_hoo_energy_flux');
+-- Root + disable gravity
+UPDATE `creature_template` SET `InhabitType` = 12 WHERE `entry` = 39612;
+-- Spatial Anomaly cannot critically hit
+UPDATE `creature_template` SET `flags_extra` = `flags_extra` | 131072 WHERE `entry` = 40170;
+
+DELETE FROM `spell_script_names` WHERE `ScriptName` IN ('spell_isiset_veil_of_sky', 'spell_isiset_supernova_disorient', 'spell_isiset_supernova_damage', 'spell_isiset_mirror_image_starry_sky_spawner', 'spell_isiset_mirror_image_spawner', 'spell_isiset_image_explosion', 'spell_isiset_astral_rain_controller', 'spell_isiset_mana_shield_controller', 'spell_isiset_astral_familiar_controller', 'spell_hoo_energy_flux', 'spell_hoo_arcane_energy_check');
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (74133, 'spell_isiset_veil_of_sky'),
 (74372, 'spell_isiset_veil_of_sky'),
@@ -24,7 +27,8 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (74381, 'spell_isiset_astral_rain_controller'),
 (74382, 'spell_isiset_mana_shield_controller'),
 (74383, 'spell_isiset_astral_familiar_controller'),
-(82382, 'spell_hoo_energy_flux');
+(82382, 'spell_hoo_energy_flux'),
+(74880, 'spell_hoo_arcane_energy_check');
 
 -- Spell condition
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 13 AND `SourceEntry` IN (82377, 74043);
@@ -76,6 +80,14 @@ UPDATE `creature_template` SET `AIName` = "SmartAI" WHERE `entry` = 39612;
 DELETE FROM `smart_scripts` WHERE `entryorguid` = 39612 AND `source_type` = 0;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param_string`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (39612, 0, 0, 0, 0, 0, 100, 0, 3000, 3000, 12000, 12000, '', 11, 82382, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Spatial Flux - In Combat - Cast \'Energy Flux\'');
+
+-- Spatial Anomaly SAI
+UPDATE `creature_template` SET `AIName` = "SmartAI" WHERE `entry` = 40170;
+DELETE FROM `smart_scripts` WHERE `entryorguid` = 40170 AND `source_type` = 0;
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param_string`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(40170, 0, 0, 1, 4, 0, 100, 0, 0, 0, 0, 0, '', 11, 72242, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Spatial Anomaly - On Aggro - Cast \'Arcane Barrage\' on self'),
+(40170, 0, 1, 2, 4, 0, 100, 0, 0, 0, 0, 0, '', 11, 74869, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Spatial Anomaly - On Aggro - Cast \'Arcane Form Dummy\' on self'),
+(40170, 0, 2, 0, 4, 0, 100, 0, 0, 0, 0, 0, '', 11, 74880, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Spatial Anomaly - On Aggro - Cast \'Arcane Energy Periodic\' on self');
 
 -- Flux Animator SAI
 UPDATE `creature_template` SET `AIName` = "SmartAI" WHERE `entry` = 40033;

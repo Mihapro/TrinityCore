@@ -71,33 +71,6 @@ public:
     }
 };
 
-// 40170 - Spatial Anomaly
-class npc_spatial_anomaly : public CreatureScript
-{
-public: npc_spatial_anomaly() : CreatureScript("npc_spatial_anomaly") { }
-
-        struct npc_spatial_anomalyAI : public ScriptedAI
-        {
-            npc_spatial_anomalyAI(Creature* creature) : ScriptedAI(creature)
-            {
-                DoCast(me, SPELL_ZERO_ENERGY_NO_REGEN_AURA);
-                DoCast(me, SPELL_ARCANE_FORM_DUMMY);
-                DoCast(me, SPELL_ARCANE_ENERGY_PERIODIC);
-            }
-
-            void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
-            {
-                if (spell->Id == SPELL_ARCANE_ENERGY_ENERGIZE && me->GetPowerPct(POWER_ENERGY) == 100.0f)
-                    DoCast(me, SPELL_ARCANE_BURST);
-            }
-        };        
-
-        CreatureAI* GetAI(Creature* creature) const override
-        {
-            return GetHallsOfOriginationAI<npc_spatial_anomalyAI>(creature);
-        }
-};
-
 // 82382 - Energy Flux
 class spell_hoo_energy_flux : public SpellScriptLoader
 {
@@ -130,13 +103,37 @@ public:
     }
 };
 
-// 74881 - Arcane Energy Energize
+// 74880 - Arcane Energy
+class spell_hoo_arcane_energy_check : public SpellScriptLoader     // 64148
+{
+public:
+    spell_hoo_arcane_energy_check() : SpellScriptLoader("spell_arcane_energy_check") { }
 
+    class spell_hoo_arcane_energy_check_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_hoo_arcane_energy_check_AuraScript);
+
+        void AfterProc(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
+        {
+            if (GetTarget()->GetPowerPct(POWER_ENERGY) == 100.0f)
+                GetTarget()->CastSpell(GetTarget(), SPELL_ARCANE_BURST, true);
+        }
+
+        void Register() override
+        {
+            AfterEffectProc += AuraEffectProcFn(spell_hoo_arcane_energy_check_AuraScript::AfterProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_hoo_arcane_energy_check_AuraScript();
+    }
+};
 
 void AddSC_halls_of_origination()
 {
-    //new npc_spatial_flux();
     new npc_energy_flux();
-    new npc_spatial_anomaly();
     new spell_hoo_energy_flux();
+    new spell_hoo_arcane_energy_check();
 }
