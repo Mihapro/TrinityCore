@@ -53,7 +53,7 @@ enum Texts
 
 enum Gossip
 {
-    GOSSIP_MENU_WE_ARE_READY = 11339,
+    GOSSIP_MENU_WE_ARE_READY          = 11339,
 };
 
 enum Events
@@ -337,24 +337,13 @@ class npc_brann_bronzebeard_anraphet : public CreatureScript
     public:
         npc_brann_bronzebeard_anraphet() : CreatureScript("npc_brann_bronzebeard_anraphet") { }
 
-        bool OnGossipHello(Player* player, Creature* creature) override
-        {
-            InstanceScript* instance = creature->GetInstanceScript();
-            if (!instance || instance->GetBossState(DATA_VAULT_OF_LIGHTS) == DONE)
-                return false;
-
-            player->PrepareGossipMenu(creature, GOSSIP_MENU_WE_ARE_READY, true);
-            player->SendPreparedGossip(creature);
-            return true;
-        }
-
         struct npc_brann_bronzebeard_anraphetAI : public CreatureAI
         {
             npc_brann_bronzebeard_anraphetAI(Creature* creature) : CreatureAI(creature), _currentPoint(0), _instance(creature->GetInstanceScript()) { }
 
             void Reset() override
             {
-                events.ScheduleEvent(EVENT_BRANN_IDLE_EMOTE, 45000);
+                events.ScheduleEvent(EVENT_BRANN_IDLE_EMOTE, Seconds(45));
             }
 
             void sGossipSelect(Player* /*player*/, uint32 menuId, uint32 /*gossipListId*/) override
