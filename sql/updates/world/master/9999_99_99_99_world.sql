@@ -59,19 +59,49 @@ INSERT INTO `reference_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `
 (39586, 56415, 0, 0, 0, 1, 1, 1, 1, NULL),
 (39586, 56416, 0, 0, 0, 1, 1, 1, 1, NULL);
 
--- Isiset trash formations
-DELETE FROM `creature_formations` WHERE `leaderGUID` IN (313971,313972);
+DELETE FROM `creature_formations` WHERE `leaderGUID` IN (313971,313972,322519,322053,322210,320942,317604,317458);
 INSERT INTO `creature_formations` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`groupAI`) VALUES
+-- Isiset trash right-side formation
 (313971,313971,0,0,3),
 (313971,317535,0,0,3),
 (313971,313950,0,0,3),
 (313971,313951,0,0,3),
 (313971,313952,0,0,3),
+-- Isiset trash left-side formation
 (313972,313972,0,0,3),
 (313972,320781,0,0,3),
 (313972,320754,0,0,3),
 (313972,313949,0,0,3),
-(313972,313953,0,0,3);
+(313972,313953,0,0,3),
+-- First group, on the beginning
+(322519,322519,0,0,3),
+(322519,322579,0,0,3),
+(322519,322520,0,0,3),
+(322519,322578,0,0,3),
+-- Second right-side group
+(322053,322053,0,0,3),
+(322053,322465,7,140,515),
+(322053,322211,7,220,515),
+(322053,322466,7,180,515),
+-- Second left-side group
+(322210,322210,0,0,3),
+(322210,321936,7,140,515),
+(322210,321868,7,220,515),
+(322210,321867,7,180,515),
+-- Third group (1 spawn missing in db)
+(320942,320942,0,0,3),
+(320942,321479,0,0,3),
+-- Group before elevator
+(317604,317604,0,0,3),
+(317604,317603,0,0,3),
+(317604,317601,0,0,3),
+(317604,317570,0,0,3),
+-- Group west from elevator
+(317458,317458,0,0,3),
+(317458,320150,8,150,515),
+(317458,317381,8,210,515),
+(317458,317382,8,270,515);
+
 
 -- Spatial Flux SAI (root + disable gravity)
 UPDATE `creature_template` SET `AIName` = "SmartAI", `InhabitType` = 12 WHERE `entry` = 39612;
@@ -139,4 +169,4 @@ UPDATE `creature_template` SET `AIName` = "SmartAI", `InhabitType` = 12, `unit_f
 DELETE FROM `smart_scripts` WHERE `entryorguid` = 39258 AND `source_type` = 0;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param_string`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (39258, 0, 0, 1, 25, 0, 100, 0, 0, 0, 0, 0, '', 8, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Rune of Healing - On Reset - Set react state to passive'),
-(39258, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, '', 11, 73695, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Rune of Healing - On Reset - Cast \'Rune of Healing\' on self');
+(39258, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, '', 11, 89549, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Rune of Healing - On Reset - Cast \'Rune of Healing\' on self');
