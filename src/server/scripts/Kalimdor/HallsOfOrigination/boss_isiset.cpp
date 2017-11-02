@@ -684,8 +684,7 @@ public:
 
         void Register() override
         {
-            // This hook won't work (operator += doesnt match operand AfterEffectManaShield). :-(
-            //AfterEffectManaShield += AuraEffectAbsorbFn(spell_isiset_veil_of_sky_AuraScript::Trigger, EFFECT_0);
+            AfterEffectManaShield += AuraEffectManaShieldFn(spell_isiset_veil_of_sky_AuraScript::Trigger, EFFECT_0);
         }
 
     private:
