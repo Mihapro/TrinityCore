@@ -109,9 +109,9 @@ enum Events
     EVENT_ORB_SET_AGGRESSIVE,
     EVENT_ORB_ARCANE_BARRAGE,
 
-    EVENT_IMAGE_ASTRAL_RAIN,
-    EVENT_IMAGE_ARCANE_BARRAGE,
-    EVENT_IMAGE_VEIL_OF_SKY,
+    EVENT_IMAGE_ASTRAL_RAIN_ABILITY,
+    EVENT_IMAGE_ARCANE_BARRAGE_ABILITY,
+    EVENT_IMAGE_VEIL_OF_SKY_ABILITY,
 
     EVENT_STARRY_SKY_ADD_VISUAL,
 
@@ -146,16 +146,17 @@ public:
             instance->SetData(DATA_ISISET_ASTRAL_RAIN_ALIVE, 1);
             instance->SetData(DATA_ISISET_CELESTIAL_CALL_ALIVE, 1);
             instance->SetData(DATA_ISISET_VEIL_OF_SKY_ALIVE, 1);
-
-            RescheduleEvents();
         }
 
         void EnterCombat(Unit* /*victim*/) override
         {
-            instance->SendEncounterUnit(ENCOUNTER_FRAME_SET_COMBAT_RES_LIMIT, 0);
-            me->SetReactState(REACT_PASSIVE);
             Talk(SAY_AGGRO);
+            RescheduleEvents();
+
             _EnterCombat();
+
+            me->SetReactState(REACT_PASSIVE);
+            instance->SendEncounterUnit(ENCOUNTER_FRAME_SET_COMBAT_RES_LIMIT, 0);
         }
 
         void DamageTaken(Unit* /*attacker*/, uint32 &damage) override
@@ -303,6 +304,7 @@ public:
         npc_celestial_familiarAI(Creature* creature) : ScriptedAI(creature)
         {
             me->SetReactState(REACT_PASSIVE);
+            me->SetInCombatWithZone();
             events.ScheduleEvent(EVENT_ORB_ADD_VISUAL, 1200);
             events.ScheduleEvent(EVENT_ORB_SET_AGGRESSIVE, 2400);
             events.ScheduleEvent(EVENT_ORB_ARCANE_BARRAGE, Seconds(urand(4,6)));
@@ -310,6 +312,9 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
+            if (!UpdateVictim())
+                return;
+
             events.Update(diff);
 
             if (me->HasUnitState(UNIT_STATE_CASTING))
@@ -415,19 +420,34 @@ public:
 };
 
 // 39720 - Astral Rain
-class npc_astral_rain : public CreatureScript
+// 39721 - Celestial Call
+// 39722 - Veil of Sky
+class npc_isiset_mirror_image : public CreatureScript
 {
 public:
-    npc_astral_rain() : CreatureScript("npc_astral_rain") { }
+    npc_isiset_mirror_image() : CreatureScript("npc_isiset_mirror_image") { }
 
-    struct npc_astral_rainAI : public ScriptedAI
+    struct npc_isiset_mirror_imageAI : public ScriptedAI
     {
-        npc_astral_rainAI(Creature* creature) : ScriptedAI(creature), _instance(creature->GetInstanceScript())
+        npc_isiset_mirror_imageAI(Creature* creature) : ScriptedAI(creature), _instance(creature->GetInstanceScript())
         {
             me->SetReactState(REACT_PASSIVE);
             _instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me, 1);
-            _events.ScheduleEvent(EVENT_IMAGE_ASTRAL_RAIN, Seconds(3), Seconds(5));
-            DoCastSelf(SPELL_STARFALL_STATE_VISUAL);
+
+            switch (me->GetEntry()) {
+                case NPC_ASTRAL_RAIN:
+                    _events.ScheduleEvent(EVENT_IMAGE_ASTRAL_RAIN_ABILITY, Seconds(3), Seconds(5));
+                    DoCastSelf(SPELL_STARFALL_STATE_VISUAL);
+                    break;
+                case NPC_CELESTIAL_CALL:
+                    _events.ScheduleEvent(EVENT_IMAGE_ARCANE_BARRAGE_ABILITY, Seconds(6));
+                    DoCastSelf(SPELL_ADDS_STATE_VISUAL);
+                    break;
+                case NPC_VEIL_OF_SKY:
+                    _events.ScheduleEvent(EVENT_IMAGE_VEIL_OF_SKY_ABILITY, Seconds(8), Seconds(9));
+                    //DoCastSelf(SPELL_MANA_SHIELD_STATE_VISUAL); // Disabled in sniffs/on retail, too shiny. 
+                    break;
+            }
         }
 
         void DamageTaken(Unit* /*attacker*/, uint32 &damage) override
@@ -437,7 +457,6 @@ public:
                 return;
 
             me->SetReactState(REACT_PASSIVE);
-
             damage = me->GetHealth() - 1;
             DoCastSelf(SPELL_IMAGE_EXPLOSION);
         }
@@ -448,8 +467,8 @@ public:
             {
                 case ACTION_IMAGES_SET_AGGRESSIVE:
                     me->SetReactState(REACT_AGGRESSIVE);
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
-                        AttackStart(target);
+                    me->SetInCombatWithZone();
+                    AttackStart(SelectTarget(SELECT_TARGET_RANDOM));
                     break;
                 case ACTION_IMAGES_SET_PASSIVE:
                     me->SetReactState(REACT_PASSIVE);
@@ -476,95 +495,18 @@ public:
             {
                 switch (eventId)
                 {
-                    case EVENT_IMAGE_ASTRAL_RAIN:
+                    case EVENT_IMAGE_ASTRAL_RAIN_ABILITY:
                         DoCastSelf(SPELL_ASTRAL_RAIN_CONTROLLER);
                         _events.Repeat(Seconds(16), Seconds(19));
                         break;
-                    default:
-                        break;
-                }
-            }
-
-            DoMeleeAttackIfReady();
-        }
-
-    private:
-        EventMap _events;
-        InstanceScript* _instance;
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetHallsOfOriginationAI<npc_astral_rainAI>(creature);
-    }
-};
-
-// 39721 - Celestial Call
-class npc_celestial_call : public CreatureScript
-{
-public:
-    npc_celestial_call() : CreatureScript("npc_celestial_call") { }
-
-    struct npc_celestial_callAI : public ScriptedAI
-    {
-        npc_celestial_callAI(Creature* creature) : ScriptedAI(creature), _instance(creature->GetInstanceScript())
-        {
-            me->SetReactState(REACT_PASSIVE);
-            _instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me, 1);
-            _events.ScheduleEvent(EVENT_IMAGE_ARCANE_BARRAGE, Seconds(6));
-            DoCastSelf(SPELL_ADDS_STATE_VISUAL);            
-        }
-
-        void DamageTaken(Unit* /*attacker*/, uint32 &damage) override
-        {
-            // Because only one image explodes, others become passive
-            if (me->GetReactState() != REACT_AGGRESSIVE || me->GetHealth() > damage)
-                return;
-
-            me->SetReactState(REACT_PASSIVE);
-
-            damage = me->GetHealth() - 1;
-            DoCastSelf(SPELL_IMAGE_EXPLOSION);
-        }
-
-        void DoAction(int32 action) override
-        {
-            switch (action)
-            {
-                case ACTION_IMAGES_SET_AGGRESSIVE:
-                    me->SetReactState(REACT_AGGRESSIVE);
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
-                        AttackStart(target);
-                    break;
-                case ACTION_IMAGES_SET_PASSIVE:
-                    me->SetReactState(REACT_PASSIVE);
-                    me->AttackStop();
-                    break;
-                case ACTION_IMAGES_DESPAWN:
-                    _instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
-                    me->DespawnOrUnsummon();
-                    break;
-            }
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            _events.Update(diff);
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            while (uint32 eventId = _events.ExecuteEvent())
-            {
-                switch (eventId)
-                {
-                    case EVENT_IMAGE_ARCANE_BARRAGE:
+                    case EVENT_IMAGE_ARCANE_BARRAGE_ABILITY:
                         DoCastSelf(SPELL_ARCANE_BARRAGE);
                         _events.Repeat(Seconds(8), Seconds(10));
                         break;
+                    case EVENT_IMAGE_VEIL_OF_SKY_ABILITY:
+                        DoCastSelf(SPELL_VEIL_OF_SKY_1); // Veil of Sky npc does not cast controller spell!
+                        //_events.Repeat(Seconds(20), Seconds(25)); // It does probably not repeat.
+                        break;
                     default:
                         break;
                 }
@@ -580,109 +522,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetHallsOfOriginationAI<npc_celestial_callAI>(creature);
-    }
-};
-
-// 39722 - Veil of Sky
-class npc_veil_of_sky : public CreatureScript
-{
-public:
-    npc_veil_of_sky() : CreatureScript("npc_veil_of_sky") { }
-
-    struct npc_veil_of_skyAI : public ScriptedAI
-    {
-        npc_veil_of_skyAI(Creature* creature) : ScriptedAI(creature), _instance(creature->GetInstanceScript())
-        {
-            me->SetReactState(REACT_PASSIVE);
-            _instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me, 1);
-            _events.ScheduleEvent(EVENT_IMAGE_VEIL_OF_SKY, Seconds(8),Seconds(9));
-            //DoCastSelf(SPELL_MANA_SHIELD_STATE_VISUAL); // Disabled in sniffs/on retail, too shiny. 
-            
-        }
-
-        void DamageTaken(Unit* /*attacker*/, uint32 &damage) override
-        {
-            // Because only one image explodes, others become passive
-            if (me->GetReactState() != REACT_AGGRESSIVE || me->GetHealth() > damage)
-                return;
-
-            me->SetReactState(REACT_PASSIVE);
-
-            damage = me->GetHealth() - 1;
-            DoCastSelf(SPELL_IMAGE_EXPLOSION);
-        }
-
-        void DoAction(int32 action) override
-        {
-            switch (action)
-            {
-                case ACTION_IMAGES_SET_AGGRESSIVE:
-                    me->SetReactState(REACT_AGGRESSIVE);
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
-                        AttackStart(target);
-                    break;
-                case ACTION_IMAGES_SET_PASSIVE:
-                    me->SetReactState(REACT_PASSIVE);
-                    me->AttackStop();
-                    break;
-                case ACTION_IMAGES_DESPAWN:
-                    _instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
-                    me->DespawnOrUnsummon();
-                    break;
-            }
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            _events.Update(diff);
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            while (uint32 eventId = _events.ExecuteEvent())
-            {
-                switch (eventId)
-                {
-                    case EVENT_IMAGE_VEIL_OF_SKY: 
-                        CastManaShield(); // Does second Veil of Sky npc cast stronger shield?
-                        // Not sure if it should repeat, cooldown copied from Isiset.
-                        _events.Repeat(Seconds(20), Seconds(25));
-                        break;
-                    default:
-                        break;
-                }
-            }
-
-            DoMeleeAttackIfReady();
-        }
-
-    private:
-        // This image does not cast controller spell,
-        // so we do the same thing Mana Shield Controller Spell does.
-        void CastManaShield()
-        {
-            switch (_instance->GetData(DATA_ISISET_PHASE))
-            {
-                case 1:
-                    DoCastSelf(SPELL_VEIL_OF_SKY_1);
-                    break;
-                case 2:
-                    DoCastSelf(SPELL_VEIL_OF_SKY_2);
-                    break;
-            }
-        }
-        
-        EventMap _events;
-        InstanceScript* _instance;
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetHallsOfOriginationAI<npc_veil_of_skyAI>(creature);
+        return GetHallsOfOriginationAI<npc_isiset_mirror_imageAI>(creature);
     }
 };
 
@@ -1021,9 +861,7 @@ void AddSC_boss_isiset()
     new npc_celestial_familiar();
     new npc_astral_shift_explosion_visual();
     new npc_starry_sky();
-    new npc_astral_rain();
-    new npc_celestial_call();
-    new npc_veil_of_sky();
+    new npc_isiset_mirror_image();
     new spell_isiset_astral_rain_controller();
     new spell_isiset_mana_shield_controller();
     new spell_isiset_astral_familiar_controller();

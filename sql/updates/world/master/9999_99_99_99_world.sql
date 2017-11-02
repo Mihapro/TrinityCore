@@ -4,9 +4,9 @@ UPDATE `creature_template` SET `ScriptName` = 'boss_isiset', `difficulty_entry_1
 UPDATE `creature_template` SET `ScriptName` = 'npc_celestial_familiar' WHERE `entry` = 39795;
 UPDATE `creature_template` SET `ScriptName` = 'npc_astral_shift_explosion_visual' WHERE `entry` = 39787;
 UPDATE `creature_template` SET `ScriptName` = 'npc_starry_sky' WHERE `entry` = 39681;
-UPDATE `creature_template` SET `ScriptName` = 'npc_astral_rain' WHERE `entry` = 39720;
-UPDATE `creature_template` SET `ScriptName` = 'npc_celestial_call' WHERE `entry` = 39721;
-UPDATE `creature_template` SET `ScriptName` = 'npc_veil_of_sky' WHERE `entry` = 39722;
+UPDATE `creature_template` SET `ScriptName` = 'npc_isiset_mirror_image' WHERE `entry` = 39720;
+UPDATE `creature_template` SET `ScriptName` = 'npc_isiset_mirror_image' WHERE `entry` = 39721;
+UPDATE `creature_template` SET `ScriptName` = 'npc_isiset_mirror_image' WHERE `entry` = 39722;
 UPDATE `creature_template` SET `ScriptName` = 'npc_energy_flux' WHERE `entry` = 44015;
 
 -- Brann Bronzebeard: Set menu id that is required to start the roleplay
