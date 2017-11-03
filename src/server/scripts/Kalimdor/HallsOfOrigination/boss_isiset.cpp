@@ -29,7 +29,7 @@
 enum Spells
 {
     SPELL_SUPERNOVA                         = 74136,
-    SPELL_SUPERNOVA_EFFECT = 74137,
+    SPELL_SUPERNOVA_EFFECT                  = 74137,
 
     // Startfall / Astral Rain ability
     SPELL_ASTRAL_RAIN_CONTROLLER            = 74381,
