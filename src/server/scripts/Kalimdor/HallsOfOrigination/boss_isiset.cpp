@@ -679,7 +679,7 @@ public:
             return true;
         }
 
-        void Trigger(AuraEffect* aurEff, DamageInfo& dmgInfo, uint32& absorbAmount)
+        void Trigger(AuraEffect* /*aurEff*/, DamageInfo& dmgInfo, uint32& absorbAmount)
         {
             if (dmgInfo.GetDamageType() != SPELL_DIRECT_DAMAGE)
                 return;
