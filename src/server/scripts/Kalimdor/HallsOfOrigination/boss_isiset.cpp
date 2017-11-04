@@ -90,7 +90,7 @@ enum Texts
     SAY_AGGRO                               = 0,
     SAY_SUPERNOVA                           = 1,
     SAY_SUPERNOVA_WARNING                   = 2,
-    SAY_PLAYER_DEATH                        = 3,
+    SAY_PLAYER_KILL                         = 3,
     SAY_DEATH                               = 4,
 };
 
@@ -185,6 +185,12 @@ public:
             DummyEntryCheckPredicate pred;
             summons.DoAction(ACTION_IMAGES_SET_PASSIVE, pred);
             events.ScheduleEvent(EVENT_DESPAWN_IMAGES, 2400);
+        }
+
+        void KilledUnit(Unit* who) override
+        {
+            if (who->GetTypeId() == TYPEID_PLAYER)
+                Talk(SAY_PLAYER_KILL);
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -673,13 +679,13 @@ public:
             return true;
         }
 
-        void Trigger(AuraEffect* aurEff, DamageInfo& dmgInfo, uint32& /*absorbAmount*/)
+        void Trigger(AuraEffect* aurEff, DamageInfo& dmgInfo, uint32& absorbAmount)
         {
             if (dmgInfo.GetDamageType() != SPELL_DIRECT_DAMAGE)
                 return;
 
-            int32 bp = CalculatePct(dmgInfo.GetDamage(), reflectPct);
-            GetCaster()->CastCustomSpell(dmgInfo.GetAttacker(), SPELL_VEIL_OF_SKY_DAMAGE, &bp, nullptr, nullptr, true, nullptr, aurEff);
+            int32 damage = CalculatePct(absorbAmount, reflectPct);
+            GetCaster()->CastCustomSpell(SPELL_VEIL_OF_SKY_DAMAGE, SPELLVALUE_BASE_POINT0, damage, dmgInfo.GetAttacker(), true);
         }
 
         void Register() override

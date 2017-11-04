@@ -38,8 +38,8 @@ INSERT INTO `creature_text` (`entry`, `groupid`, `id`, `text`, `type`, `language
 (39587, 0, 0, 'Gaze to the heavens! What do you see?', 14, 0, 100, 0, 0, 18843, 0, 0, 'Isiset - aggro'),
 (39587, 1, 0, 'Bask in my radiance!', 14, 0, 100, 0, 0, 18845, 0, 0, 'Isiset - cast Supernova'),
 (39587, 2, 0, '%s begins to channel a Supernova. Look away!', 41, 0, 100, 0, 0, 0, 0, 0, 'Isiset - cast Supernova'),
-(39587, 3, 0, 'Insignificant!', 14, 0, 100, 0, 0, 18846, 0, 0, 'Isiset - player death'),
-(39587, 3, 1, 'The glimmer of your life, extinguished.', 14, 0, 100, 0, 0, 18847, 0, 0, 'Isiset - player death'),
+(39587, 3, 0, 'Insignificant!', 14, 0, 100, 0, 0, 18847, 0, 0, 'Isiset - player death'),
+(39587, 3, 1, 'The glimmer of your life, extinguished.', 14, 0, 100, 0, 0, 18846, 0, 0, 'Isiset - player death'),
 (39587, 4, 0, 'Eons of darkness... by your hand.', 14, 0, 100, 0, 0, 18842, 0, 0, 'Isiset - death'),
 (39587, 4, 1, 'My luster... wanes.', 14, 0, 100, 0, 0, 18844, 0, 0, 'Isiset - death');
 
@@ -57,6 +57,10 @@ INSERT INTO `reference_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `
 (39586, 56415, 0, 0, 0, 1, 1, 1, 1, NULL),
 (39586, 56416, 0, 0, 0, 1, 1, 1, 1, NULL);
 
+-- Random movement for Isiset trash
+UPDATE `creature` SET `MovementType` = 1, `spawndist` = 10 WHERE `guid` IN (317535,313950,313951,313952,320781,320754,313949,313953);
+
+-- Trash groups
 DELETE FROM `creature_formations` WHERE `leaderGUID` IN (313971,313972,322519,322466,322210,320942,317604,317458);
 INSERT INTO `creature_formations` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`groupAI`,`point_1`,`point_2`) VALUES
 -- Isiset trash right-side formation
