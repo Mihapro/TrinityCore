@@ -15,11 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// To-do:
-// - spell_isiset_veil_of_sky: Reflect not working, see also spell_boss_lady_malande_shield.
-
 #include "ScriptMgr.h"
 #include "ObjectAccessor.h"
+#include "GridNotifiers.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
 #include "SpellAuraEffects.h"
@@ -75,6 +73,12 @@ enum Spells
 
     // Astral Shift Explosion Visual npc
     SPELL_ASTRAL_SHIFT_EXPLOSION_VISUAL     = 74331,
+
+    // Spatial Flux & Energy Flux (heroic only)
+    SPELL_CALL_OF_SKY                       = 90750, // Creates Spatial Flux
+    SPELL_ENERGY_FLUX                       = 90735, // Makes random enemy cast Summon Energy Flux
+    SPELL_ENERGY_FLUX_TRIGGER               = 90741, // Makes Spatial Flux cast visual beam
+    SPELL_ENERGY_FLUX_PERIODIC              = 74044,
 };
 
 enum NPCs
@@ -83,6 +87,7 @@ enum NPCs
     NPC_ASTRAL_RAIN                         = 39720, // N
     NPC_CELESTIAL_CALL                      = 39721, // E
     NPC_VEIL_OF_SKY                         = 39722, // W
+    NPC_ISISET_SPATIAL_FLUX                 = 48709, // heroic only
 };
 
 enum Texts
@@ -97,7 +102,6 @@ enum Texts
 enum Events
 {
     EVENT_NONE,
-    EVENT_START_ATTACK,
     EVENT_SUPERNOVA,
     EVENT_ASTRAL_RAIN,
     EVENT_ASTRAL_FAMILIAR,
@@ -142,6 +146,7 @@ public:
 
             me->SetReactState(REACT_AGGRESSIVE);
 
+            transitionPhase = false;
             instance->SetData(DATA_ISISET_PHASE, 1);
             instance->SetData(DATA_ISISET_ASTRAL_RAIN_ALIVE, 1);
             instance->SetData(DATA_ISISET_CELESTIAL_CALL_ALIVE, 1);
@@ -151,17 +156,16 @@ public:
         void EnterCombat(Unit* /*victim*/) override
         {
             Talk(SAY_AGGRO);
+            if (IsHeroic())
+                DoCastSelf(SPELL_CALL_OF_SKY);
             RescheduleEvents();
-
             _EnterCombat();
-
-            me->SetReactState(REACT_PASSIVE);
             instance->SendEncounterUnit(ENCOUNTER_FRAME_SET_COMBAT_RES_LIMIT, 0);
         }
 
         void DamageTaken(Unit* /*attacker*/, uint32 &damage) override
         {
-            if (me->HasAura(SPELL_ASTRAL_SHIFT))
+            if (transitionPhase)
                 return;
 
             // Second transition
@@ -215,11 +219,6 @@ public:
             {
                 switch (eventId)
                 {
-                    case EVENT_START_ATTACK:
-                        instance->SendEncounterUnit(ENCOUNTER_FRAME_UPDATE_PRIORITY, me, 1);
-                        me->SetReactState(REACT_AGGRESSIVE);
-                        DoStartMovement(me->GetVictim());
-                        break;
                     case EVENT_ASTRAL_RAIN:
                         DoCastSelf(SPELL_ASTRAL_RAIN_CONTROLLER);
                         events.Repeat(Seconds(15), Seconds(19));
@@ -249,7 +248,9 @@ public:
                         DummyEntryCheckPredicate pred;
                         summons.DoAction(ACTION_IMAGES_DESPAWN, pred);
                         instance->SetData(DATA_ISISET_PHASE, instance->GetData(DATA_ISISET_PHASE) + 1);
+                        transitionPhase = false;
                         me->RemoveAurasDueToSpell(SPELL_ASTRAL_SHIFT);
+                        instance->SendEncounterUnit(ENCOUNTER_FRAME_UPDATE_PRIORITY, me, 1);
                         RescheduleEvents();
                         break;
                     }
@@ -265,7 +266,6 @@ public:
         void RescheduleEvents()
         {
             events.Reset();
-            events.ScheduleEvent(EVENT_START_ATTACK, 1200);
             if (instance->GetData(DATA_ISISET_ASTRAL_RAIN_ALIVE) == 1)
                 events.ScheduleEvent(EVENT_ASTRAL_RAIN, Seconds(4), Seconds(6));
             if (instance->GetData(DATA_ISISET_CELESTIAL_CALL_ALIVE) == 1)
@@ -278,6 +278,8 @@ public:
         // Mirror Image transition phase
         void MirrorImage()
         {
+            transitionPhase = true;
+
             events.Reset();
             instance->SendEncounterUnit(ENCOUNTER_FRAME_UPDATE_PRIORITY, me, 0);
             mirrorImageDied = false;
@@ -290,6 +292,7 @@ public:
             events.ScheduleEvent(EVENT_IMAGES_ATTACK, Seconds(2));
         }
 
+        bool transitionPhase;
         bool mirrorImageDied;
     };
 
@@ -529,6 +532,82 @@ public:
     CreatureAI* GetAI(Creature* creature) const override
     {
         return GetHallsOfOriginationAI<npc_isiset_mirror_imageAI>(creature);
+    }
+};
+
+// 48707 - Spatial Flux (heroic only)
+class npc_isiset_spatial_flux : public CreatureScript
+{
+public:
+    npc_isiset_spatial_flux() : CreatureScript("npc_isiset_spatial_flux") { }
+
+    struct npc_isiset_spatial_fluxAI : public ScriptedAI
+    {
+        npc_isiset_spatial_fluxAI(Creature* creature) : ScriptedAI(creature)
+        {
+            me->SetReactState(REACT_PASSIVE);
+            me->SetInCombatWithZone();
+            
+            events.ScheduleEvent(EVENT_ENERGY_FLUX, Seconds(3));
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (!UpdateVictim())
+                return;
+
+            events.Update(diff);
+
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            while (uint32 eventId = events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                    case EVENT_ENERGY_FLUX:
+                        DoCastSelf(SPELL_ENERGY_FLUX);
+                        events.Repeat(Seconds(12));
+                    default:
+                        break;
+                }
+            }
+        }
+
+    private:
+        EventMap events;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return GetHallsOfOriginationAI<npc_isiset_spatial_fluxAI>(creature);
+    }
+};
+
+// 48709 - Energy flux (heroic only)
+class npc_isiset_energy_flux : public CreatureScript
+{
+public:
+    npc_isiset_energy_flux() : CreatureScript("npc_isiset_energy_flux") { }
+
+    struct npc_isiset_energy_fluxAI : public ScriptedAI
+    {
+        npc_isiset_energy_fluxAI(Creature* creature) : ScriptedAI(creature)
+        {
+            DoCastSelf(SPELL_ENERGY_FLUX_TRIGGER);
+            DoCastSelf(SPELL_ENERGY_FLUX_PERIODIC);
+            me->DespawnOrUnsummon(6400);
+        }
+
+        void IsSummonedBy(Unit* summoner) override
+        {
+            me->GetMotionMaster()->MoveFollow(summoner, 0.1f, 0.0f);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return GetHallsOfOriginationAI<npc_isiset_energy_fluxAI>(creature);
     }
 };
 
@@ -860,6 +939,74 @@ public:
     }
 };
 
+// 90750 - Call of Sky (heroic only)
+class spell_isiset_call_of_sky : public SpellScriptLoader
+{
+public:
+    spell_isiset_call_of_sky() : SpellScriptLoader("spell_isiset_call_of_sky") { }
+
+    class spell_isiset_call_of_sky_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_isiset_call_of_sky_SpellScript);
+
+        void OnMissleHit(SpellEffIndex /*effIndex*/)
+        {
+            if (InstanceScript* instance = GetCaster()->GetInstanceScript())
+                if (Creature* Isiset = ObjectAccessor::GetCreature(*GetCaster(), instance->GetGuidData(DATA_ISISET)))
+                    Isiset->SummonCreature(NPC_ISISET_SPATIAL_FLUX, GetHitDest()->GetPosition(), TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT);
+        }
+
+        void Register() override
+        {
+            OnEffectHit += SpellEffectFn(spell_isiset_call_of_sky_SpellScript::OnMissleHit, EFFECT_0, SPELL_EFFECT_TRIGGER_MISSILE);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_isiset_call_of_sky_SpellScript();
+    }
+};
+
+// 90735 - Energy Flux (heroic only)
+class spell_spawn_energy_flux : public SpellScriptLoader
+{
+public:
+    spell_spawn_energy_flux() : SpellScriptLoader("spell_spawn_energy_flux") { }
+
+    class spell_spawn_energy_flux_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_spawn_energy_flux_SpellScript);
+
+        void FilterTargets(std::list<WorldObject*>& targets)
+        {
+            // Remove tank
+            if (InstanceScript* instance = GetCaster()->GetInstanceScript())
+                if (Creature* Isiset = ObjectAccessor::GetCreature(*GetCaster(), instance->GetGuidData(DATA_ISISET)))
+                    if (WorldObject* tank = Isiset->AI()->SelectTarget(SELECT_TARGET_TOPAGGRO))
+                        targets.remove(tank);
+
+            targets.remove_if(Trinity::ObjectTypeIdCheck(TYPEID_PLAYER, false));
+            if (targets.empty())
+                return;
+
+            WorldObject* target = Trinity::Containers::SelectRandomContainerElement(targets);
+            targets.clear();
+            targets.push_back(target);
+        }
+
+        void Register() override
+        {
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_spawn_energy_flux_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_spawn_energy_flux_SpellScript();
+    }
+};
+
 void AddSC_boss_isiset()
 {
     new boss_isiset();
@@ -867,6 +1014,7 @@ void AddSC_boss_isiset()
     new npc_astral_shift_explosion_visual();
     new npc_starry_sky();
     new npc_isiset_mirror_image();
+    new npc_isiset_energy_flux();
     new spell_isiset_astral_rain_controller();
     new spell_isiset_mana_shield_controller();
     new spell_isiset_astral_familiar_controller();
@@ -875,4 +1023,6 @@ void AddSC_boss_isiset()
     new spell_isiset_mirror_image_starry_sky_spawner();
     new spell_isiset_mirror_image_spawner();
     new spell_isiset_image_explosion();
+    new spell_isiset_call_of_sky();
+    new spell_spawn_energy_flux();
 }

@@ -2,15 +2,17 @@
 -- Script names, heroic entry (to-do)
 UPDATE `creature_template` SET `ScriptName` = 'boss_isiset', `difficulty_entry_1` = 39586 WHERE `entry` = 39587;
 UPDATE `creature_template` SET `ScriptName` = 'npc_celestial_familiar' WHERE `entry` = 39795;
-UPDATE `creature_template` SET `ScriptName` = 'npc_astral_shift_explosion_visual' WHERE `entry` = 39787;
+UPDATE `creature_template` SET `ScriptName` = 'npc_astral_shift_explosion_visual', `unit_flags` = 33554752 WHERE `entry` = 39787;
 UPDATE `creature_template` SET `ScriptName` = 'npc_starry_sky' WHERE `entry` = 39681;
 UPDATE `creature_template` SET `ScriptName` = 'npc_isiset_mirror_image' WHERE `entry` IN (39720, 39721, 39722);
-UPDATE `creature_template` SET `ScriptName` = 'npc_energy_flux' WHERE `entry` = 44015;
+UPDATE `creature_template` SET `ScriptName` = 'npc_isiset_spatial_flux', `unit_flags` = 33556544 WHERE `entry` = 48707;
+UPDATE `creature_template` SET `ScriptName` = 'npc_isiset_energy_flux', `unit_flags` = 33554496 WHERE `entry` = 48709;
+UPDATE `creature_template` SET `ScriptName` = 'npc_energy_flux', `unit_flags` = 33554496 WHERE `entry` = 44015;
 
 -- Brann Bronzebeard: Set menu id that is required to start the roleplay
 UPDATE `creature_template` SET `gossip_menu_id` = 11339 WHERE `entry` = 39908;
 
-DELETE FROM `spell_script_names` WHERE `ScriptName` IN ('spell_isiset_veil_of_sky', 'spell_isiset_supernova_filter', 'spell_isiset_mirror_image_starry_sky_spawner', 'spell_isiset_mirror_image_spawner', 'spell_isiset_image_explosion', 'spell_isiset_astral_rain_controller', 'spell_isiset_mana_shield_controller', 'spell_isiset_astral_familiar_controller', 'spell_hoo_energy_flux', 'spell_hoo_arcane_energy_check');
+DELETE FROM `spell_script_names` WHERE `ScriptName` IN ('spell_isiset_veil_of_sky', 'spell_isiset_supernova_filter', 'spell_isiset_mirror_image_starry_sky_spawner', 'spell_isiset_mirror_image_spawner', 'spell_isiset_image_explosion', 'spell_isiset_astral_rain_controller', 'spell_isiset_mana_shield_controller', 'spell_isiset_astral_familiar_controller', 'spell_isiset_call_of_sky', 'spell_hoo_energy_flux', 'spell_hoo_arcane_energy_check');
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (74133, 'spell_isiset_veil_of_sky'),
 (74372, 'spell_isiset_veil_of_sky'),
@@ -23,14 +25,22 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (74381, 'spell_isiset_astral_rain_controller'),
 (74382, 'spell_isiset_mana_shield_controller'),
 (74383, 'spell_isiset_astral_familiar_controller'),
+(90750, 'spell_isiset_call_of_sky'),
 (82382, 'spell_hoo_energy_flux'),
 (74880, 'spell_hoo_arcane_energy_check');
 
+-- Spell target position for Call of Sky (90750)
+DELETE FROM `spell_target_position` WHERE `ID` IN (90750);
+INSERT INTO `spell_target_position` (`ID`, `EffectIndex`, `MapID`, `PositionX`, `PositionY`, `PositionZ`, `VerifiedBuild`) VALUES
+(90750, 0, 644, -490.5087, 415.5035, 344.0261, 0);
+
 -- Spell condition
-DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 13 AND `SourceEntry` IN (82377, 74043);
+DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 13 AND `SourceEntry` IN (90741, 82377, 74043);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(13, 1, 90741, 0, 0, 31, 0, 3, 48709, 0, 0, 0, 0, '', 'Energy Flux Spawn Trigger targets NPC_ISISET_SPATIAL_FLUX'),
 (13, 1, 82377, 0, 0, 31, 0, 3, 39612, 0, 0, 0, 0, '', 'Energy Flux Spawn Trigger targets NPC_SPATIAL_FLUX'),
-(13, 1, 74043, 0, 0, 31, 0, 3, 44015, 0, 0, 0, 0, '', 'Energy Flux Visual targets NPC_ENERGY_FLUX');
+(13, 1, 74043, 0, 0, 31, 0, 3, 48709, 0, 0, 0, 0, '', 'Energy Flux Visual can target NPC_ISISET_ENERGY_FLUX'),
+(13, 1, 74043, 0, 1, 31, 0, 3, 44015, 0, 0, 0, 0, '', 'Energy Flux Visual can target NPC_ENERGY_FLUX');
 
 -- Isiset Text
 DELETE FROM `creature_text` WHERE `CreatureID` IN (39587);
