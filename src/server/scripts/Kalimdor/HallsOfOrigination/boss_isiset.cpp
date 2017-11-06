@@ -75,10 +75,7 @@ enum Spells
     SPELL_ASTRAL_SHIFT_EXPLOSION_VISUAL     = 74331,
 
     // Spatial Flux & Energy Flux (heroic only)
-    SPELL_CALL_OF_SKY                       = 90750, // Creates Spatial Flux
-    SPELL_ENERGY_FLUX                       = 90735, // Makes random enemy cast Summon Energy Flux
-    SPELL_ENERGY_FLUX_TRIGGER               = 90741, // Makes Spatial Flux cast visual beam
-    SPELL_ENERGY_FLUX_PERIODIC              = 74044,
+    SPELL_CALL_OF_SKY                       = 90750, // Summons Spatial Flux
 };
 
 enum NPCs
@@ -87,7 +84,7 @@ enum NPCs
     NPC_ASTRAL_RAIN                         = 39720, // N
     NPC_CELESTIAL_CALL                      = 39721, // E
     NPC_VEIL_OF_SKY                         = 39722, // W
-    NPC_ISISET_SPATIAL_FLUX                 = 48709, // heroic only
+    NPC_ISISET_SPATIAL_FLUX                 = 48707, // heroic only
 };
 
 enum Texts
@@ -118,8 +115,6 @@ enum Events
     EVENT_IMAGE_VEIL_OF_SKY_ABILITY,
 
     EVENT_STARRY_SKY_ADD_VISUAL,
-
-    EVENT_ENERGY_FLUX,
 };
 
 enum Actions
@@ -535,82 +530,6 @@ public:
     }
 };
 
-// 48707 - Spatial Flux (heroic only)
-class npc_isiset_spatial_flux : public CreatureScript
-{
-public:
-    npc_isiset_spatial_flux() : CreatureScript("npc_isiset_spatial_flux") { }
-
-    struct npc_isiset_spatial_fluxAI : public ScriptedAI
-    {
-        npc_isiset_spatial_fluxAI(Creature* creature) : ScriptedAI(creature)
-        {
-            me->SetReactState(REACT_PASSIVE);
-            me->SetInCombatWithZone();
-            
-            events.ScheduleEvent(EVENT_ENERGY_FLUX, Seconds(3));
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            while (uint32 eventId = events.ExecuteEvent())
-            {
-                switch (eventId)
-                {
-                    case EVENT_ENERGY_FLUX:
-                        DoCastSelf(SPELL_ENERGY_FLUX);
-                        events.Repeat(Seconds(12));
-                    default:
-                        break;
-                }
-            }
-        }
-
-    private:
-        EventMap events;
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetHallsOfOriginationAI<npc_isiset_spatial_fluxAI>(creature);
-    }
-};
-
-// 48709 - Energy flux (heroic only)
-class npc_isiset_energy_flux : public CreatureScript
-{
-public:
-    npc_isiset_energy_flux() : CreatureScript("npc_isiset_energy_flux") { }
-
-    struct npc_isiset_energy_fluxAI : public ScriptedAI
-    {
-        npc_isiset_energy_fluxAI(Creature* creature) : ScriptedAI(creature)
-        {
-            DoCastSelf(SPELL_ENERGY_FLUX_TRIGGER);
-            DoCastSelf(SPELL_ENERGY_FLUX_PERIODIC);
-            me->DespawnOrUnsummon(6400);
-        }
-
-        void IsSummonedBy(Unit* summoner) override
-        {
-            me->GetMotionMaster()->MoveFollow(summoner, 0.1f, 0.0f);
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetHallsOfOriginationAI<npc_isiset_energy_fluxAI>(creature);
-    }
-};
-
 // 74381 - Astral Rain Controller Spell 
 class spell_isiset_astral_rain_controller : public SpellScriptLoader
 {
@@ -953,7 +872,7 @@ public:
         {
             if (InstanceScript* instance = GetCaster()->GetInstanceScript())
                 if (Creature* Isiset = ObjectAccessor::GetCreature(*GetCaster(), instance->GetGuidData(DATA_ISISET)))
-                    Isiset->SummonCreature(NPC_ISISET_SPATIAL_FLUX, GetHitDest()->GetPosition(), TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT);
+                    Isiset->SummonCreature(NPC_ISISET_SPATIAL_FLUX, GetHitDest()->GetPositionX(), GetHitDest()->GetPositionY(), GetHitDest()->GetPositionZ(), 2.775074f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT);
         }
 
         void Register() override
@@ -968,45 +887,6 @@ public:
     }
 };
 
-// 90735 - Energy Flux (heroic only)
-class spell_spawn_energy_flux : public SpellScriptLoader
-{
-public:
-    spell_spawn_energy_flux() : SpellScriptLoader("spell_spawn_energy_flux") { }
-
-    class spell_spawn_energy_flux_SpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_spawn_energy_flux_SpellScript);
-
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            // Remove tank
-            if (InstanceScript* instance = GetCaster()->GetInstanceScript())
-                if (Creature* Isiset = ObjectAccessor::GetCreature(*GetCaster(), instance->GetGuidData(DATA_ISISET)))
-                    if (WorldObject* tank = Isiset->AI()->SelectTarget(SELECT_TARGET_TOPAGGRO))
-                        targets.remove(tank);
-
-            targets.remove_if(Trinity::ObjectTypeIdCheck(TYPEID_PLAYER, false));
-            if (targets.empty())
-                return;
-
-            WorldObject* target = Trinity::Containers::SelectRandomContainerElement(targets);
-            targets.clear();
-            targets.push_back(target);
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_spawn_energy_flux_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_spawn_energy_flux_SpellScript();
-    }
-};
-
 void AddSC_boss_isiset()
 {
     new boss_isiset();
@@ -1014,7 +894,6 @@ void AddSC_boss_isiset()
     new npc_astral_shift_explosion_visual();
     new npc_starry_sky();
     new npc_isiset_mirror_image();
-    new npc_isiset_energy_flux();
     new spell_isiset_astral_rain_controller();
     new spell_isiset_mana_shield_controller();
     new spell_isiset_astral_familiar_controller();
@@ -1024,5 +903,4 @@ void AddSC_boss_isiset()
     new spell_isiset_mirror_image_spawner();
     new spell_isiset_image_explosion();
     new spell_isiset_call_of_sky();
-    new spell_spawn_energy_flux();
 }
