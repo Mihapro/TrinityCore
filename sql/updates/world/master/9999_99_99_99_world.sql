@@ -5,13 +5,15 @@ UPDATE `creature_template` SET `ScriptName` = 'npc_celestial_familiar' WHERE `en
 UPDATE `creature_template` SET `ScriptName` = 'npc_astral_shift_explosion_visual', `unit_flags` = 33554752 WHERE `entry` = 39787;
 UPDATE `creature_template` SET `ScriptName` = 'npc_starry_sky' WHERE `entry` = 39681;
 UPDATE `creature_template` SET `ScriptName` = 'npc_isiset_mirror_image' WHERE `entry` IN (39720, 39721, 39722);
-UPDATE `creature_template` SET `ScriptName` = 'npc_hoo_spatial_flux', `InhabitType` = 12, `unit_flags` = 33554496 WHERE `entry` IN (39612, 48707);
-UPDATE `creature_template` SET `ScriptName` = 'npc_hoo_energy_flux', `unit_flags` = 33554496, `speed_walk` = 5.5/2.5, `speed_run` = 5.5/2.5 WHERE `entry` IN (44015, 48709);
+UPDATE `creature_template` SET `ScriptName` = 'npc_isiset_spatial_flux', `InhabitType` = 12, `unit_flags` = 33554496 WHERE `entry` = 48707;
+UPDATE `creature_template` SET `ScriptName` = 'npc_isiset_energy_flux', `unit_flags` = 33554496, `speed_walk` = 5.5/2.5, `speed_run` = 5.5/2.5 WHERE `entry` = 48709;
+UPDATE `creature_template` SET `ScriptName` = 'npc_hoo_spatial_flux', `InhabitType` = 12, `unit_flags` = 33554496 WHERE `entry` = 39612;
+UPDATE `creature_template` SET `ScriptName` = 'npc_hoo_energy_flux', `unit_flags` = 33554496, `speed_walk` = 5.5/2.5, `speed_run` = 5.5/2.5 WHERE `entry` = 44015;
 
 -- Brann Bronzebeard: Set menu id that is required to start the roleplay
 UPDATE `creature_template` SET `gossip_menu_id` = 11339 WHERE `entry` = 39908;
 
-DELETE FROM `spell_script_names` WHERE `ScriptName` IN ('spell_isiset_veil_of_sky', 'spell_isiset_supernova_filter', 'spell_isiset_mirror_image_starry_sky_spawner', 'spell_isiset_mirror_image_spawner', 'spell_isiset_image_explosion', 'spell_isiset_astral_rain_controller', 'spell_isiset_mana_shield_controller', 'spell_isiset_astral_familiar_controller', 'spell_isiset_call_of_sky', 'spell_hoo_energy_flux_target_selector', 'spell_hoo_arcane_energy_check');
+DELETE FROM `spell_script_names` WHERE `ScriptName` IN ('spell_isiset_veil_of_sky', 'spell_isiset_supernova_filter', 'spell_isiset_mirror_image_starry_sky_spawner', 'spell_isiset_mirror_image_spawner', 'spell_isiset_image_explosion', 'spell_isiset_astral_rain_controller', 'spell_isiset_mana_shield_controller', 'spell_isiset_astral_familiar_controller', 'spell_isiset_call_of_sky', 'spell_hoo_energy_flux_target_selector', 'spell_isiset_energy_flux_target_selector', 'spell_hoo_arcane_energy_check');
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (74133, 'spell_isiset_veil_of_sky'),
 (74372, 'spell_isiset_veil_of_sky'),
@@ -26,7 +28,7 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (74383, 'spell_isiset_astral_familiar_controller'),
 (90750, 'spell_isiset_call_of_sky'),
 (82382, 'spell_hoo_energy_flux_target_selector'),
-(90735, 'spell_hoo_energy_flux_target_selector'),
+(90735, 'spell_isiset_energy_flux_target_selector'),
 (74880, 'spell_hoo_arcane_energy_check');
 
 -- Spell target position for Call of Sky (90750)

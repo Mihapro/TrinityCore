@@ -124,6 +124,7 @@ enum HOOMisc
     SPELL_VAULT_OF_LIGHTS_CREDIT    = 94067, // Not in DBC
     SPELL_ZERO_ENERGY_NO_REGEN_AURA = 72242, // Zero Energy + Zero Regen (used by some npcs in HoO)
     //SPELL_AURA_UNKNOWN_PURPOSE    = 59632, // Used by static NPCs, summoned by bosses in The Four Seats (not in DBC!)
+    SPELL_DUMMY_NUKE                = 68991,
 };
 
 enum HOOGlobalActions

@@ -28,21 +28,9 @@ enum Spells
 {
     // Isiset trash and adds
     SPELL_ARCANE_BURST                  = 74888, // On retail not working! Should probably be cast at full energy.
-    SPELL_DUMMY_NUKE                    = 68991,
     SPELL_SPAWN_ENERGY_FLUX_TRASH       = 82382, // Makes random player cast Summon Energy Flux
-    SPELL_SPAWN_ENERGY_FLUX_ISISET      = 90735, // Makes random player cast Summon Energy Flux
     SPELL_ENERGY_FLUX_BEAM_TRASH        = 82377, // Makes nearby Spatial Flux cast visual beam
-    SPELL_ENERGY_FLUX_BEAM_ISISET       = 90741, // Makes nearby Spatial Flux cast visual beam
     SPELL_ENERGY_FLUX_PERIODIC          = 74044,
-};
-
-enum NPCs
-{
-    // Isiset trash and adds
-    NPC_SPATIAL_FLUX_TRASH              = 39612,
-    NPC_SPATIAL_FLUX_ISISET             = 48707,
-    NPC_ENERGY_FLUX_TRASH               = 44015,
-    NPC_ENERGY_FLUX_ISISET              = 48709,
 };
 
 enum Events
@@ -56,8 +44,9 @@ enum Events
 };
 
 // 39612 - Spatial Flux (trash)
-// 48707 - Spatial Flux (Isiset)
-// To-do: Find out what Dummy Nuke (68991) spell does.
+// To-do: 
+//  - Find out what Dummy Nuke (68991) spell does.
+//  - Spatial Flux won't enter combat on second aggro from creature group.
 class npc_hoo_spatial_flux : public CreatureScript
 {
 public:
@@ -69,9 +58,6 @@ public:
 
         void Reset() override
         {
-            if (me->IsSummon())
-                me->SetInCombatWithZone();
-
             events.Reset();
             events.ScheduleEvent(EVENT_DUMMY_NUKE, Seconds(0));
             events.ScheduleEvent(EVENT_SPAWN_ENERGY_FLUX, Seconds(3));
@@ -80,11 +66,8 @@ public:
         void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
-            {
-                me->CombatStop();
                 return;
-            }
-
+            
             events.Update(diff);
 
             if (me->HasUnitState(UNIT_STATE_CASTING))
@@ -100,7 +83,7 @@ public:
                         events.Repeat(Seconds(1));
                         break;
                     case EVENT_SPAWN_ENERGY_FLUX:
-                        DoCastSelf(me->GetEntry() == NPC_SPATIAL_FLUX_TRASH ? SPELL_SPAWN_ENERGY_FLUX_TRASH : SPELL_SPAWN_ENERGY_FLUX_ISISET);
+                        DoCastSelf(SPELL_SPAWN_ENERGY_FLUX_TRASH);
                         events.Repeat(Seconds(12));
                         break;
                     default:
@@ -120,7 +103,6 @@ public:
 };
 
 // 44015 - Energy flux (trash)
-// 48709 - Energy flux (Isiset)
 class npc_hoo_energy_flux : public CreatureScript
 {
 public:
@@ -136,7 +118,7 @@ public:
 
         void Reset() override
         {
-            DoCastSelf(me->GetEntry() == NPC_ENERGY_FLUX_TRASH ? SPELL_ENERGY_FLUX_BEAM_TRASH : SPELL_ENERGY_FLUX_BEAM_ISISET);
+            DoCastSelf(SPELL_ENERGY_FLUX_BEAM_TRASH);
             DoCastSelf(SPELL_ENERGY_FLUX_PERIODIC);
             me->SetWalk(true);
             events.ScheduleEvent(EVENT_FOLLOW_SUMMONER, Seconds(1));
@@ -181,7 +163,6 @@ public:
 };
 
 // 82382 - Energy Flux (trash mob Spatial Flux)
-// 90735 - Energy Flux (Isiset's Spatial Flux)
 class spell_hoo_energy_flux_target_selector : public SpellScriptLoader
 {
 public:
