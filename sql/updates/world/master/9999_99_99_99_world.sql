@@ -5,7 +5,7 @@ UPDATE `creature_template` SET `ScriptName` = 'npc_celestial_familiar' WHERE `en
 UPDATE `creature_template` SET `ScriptName` = 'npc_astral_shift_explosion_visual', `unit_flags` = 33554752 WHERE `entry` = 39787;
 UPDATE `creature_template` SET `ScriptName` = 'npc_starry_sky' WHERE `entry` = 39681;
 UPDATE `creature_template` SET `ScriptName` = 'npc_isiset_mirror_image' WHERE `entry` IN (39720, 39721, 39722);
-UPDATE `creature_template` SET `ScriptName` = 'npc_hoo_spatial_flux', `InhabitType` = 12, `unit_flags` = 33556544 WHERE `entry` IN (39612, 48707);
+UPDATE `creature_template` SET `ScriptName` = 'npc_hoo_spatial_flux', `InhabitType` = 12, `unit_flags` = 33554496 WHERE `entry` IN (39612, 48707);
 UPDATE `creature_template` SET `ScriptName` = 'npc_hoo_energy_flux', `unit_flags` = 33554496, `speed_walk` = 5.5/2.5, `speed_run` = 5.5/2.5 WHERE `entry` IN (44015, 48709);
 
 -- Brann Bronzebeard: Set menu id that is required to start the roleplay

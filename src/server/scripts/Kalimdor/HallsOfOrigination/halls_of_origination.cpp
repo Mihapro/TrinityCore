@@ -71,6 +71,8 @@ public:
         {
             if (me->IsSummon())
                 me->SetInCombatWithZone();
+
+            events.Reset();
             events.ScheduleEvent(EVENT_DUMMY_NUKE, Seconds(0));
             events.ScheduleEvent(EVENT_SPAWN_ENERGY_FLUX, Seconds(3));
         }
@@ -78,7 +80,10 @@ public:
         void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
+            {
+                me->CombatStop();
                 return;
+            }
 
             events.Update(diff);
 
@@ -126,6 +131,7 @@ public:
         npc_hoo_energy_fluxAI(Creature* creature) : ScriptedAI(creature)
         {
             me->SetReactState(REACT_PASSIVE);
+            target = nullptr;
         }
 
         void Reset() override
