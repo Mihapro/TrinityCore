@@ -27,6 +27,7 @@
 enum Spells
 {
     // Isiset trash and adds
+    SPELL_ARCANE_ENERGY                 = 74881,
     SPELL_ARCANE_BURST                  = 74888, // On retail not working! Should probably be cast at full energy.
     SPELL_SPAWN_ENERGY_FLUX_TRASH       = 82382, // Makes random player cast Summon Energy Flux
     SPELL_ENERGY_FLUX_BEAM_TRASH        = 82377, // Makes nearby Spatial Flux cast visual beam
@@ -205,16 +206,27 @@ public:
 class spell_hoo_arcane_energy_check : public SpellScriptLoader
 {
 public:
-    spell_hoo_arcane_energy_check() : SpellScriptLoader("spell_arcane_energy_check") { }
+    spell_hoo_arcane_energy_check() : SpellScriptLoader("spell_hoo_arcane_energy_check") { }
 
     class spell_hoo_arcane_energy_check_AuraScript : public AuraScript
     {
         PrepareAuraScript(spell_hoo_arcane_energy_check_AuraScript);
 
+        bool Validate(SpellInfo const* /*spell*/) override
+        {
+            return ValidateSpellInfo({ SPELL_ARCANE_BURST, SPELL_ARCANE_ENERGY });
+        }
+
         void AfterProc(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
         {
             if (GetTarget()->GetPowerPct(POWER_ENERGY) == 100.0f)
-                GetTarget()->CastSpell(GetTarget(), SPELL_ARCANE_BURST, true);
+            {
+                GetTarget()->CastSpell((Unit*)nullptr, SPELL_ARCANE_BURST, false);
+
+                // Stacks should probably be consumed, right? (note: this ability doesn't work on retail)
+                GetTarget()->RemoveAurasDueToSpell(SPELL_ARCANE_ENERGY);
+                GetTarget()->SetPower(POWER_ENERGY, 0);
+            }
         }
 
         void Register() override
