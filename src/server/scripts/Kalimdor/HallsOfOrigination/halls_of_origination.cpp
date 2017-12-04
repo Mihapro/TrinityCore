@@ -15,6 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+ /* To-do: */
+ // - Find out what Dummy Nuke (68991) spell does.
+ // - Spatial Flux won't enter combat on second aggro from creature group (but it should).
+
 #include "ScriptMgr.h"
 #include "GameObject.h"
 #include "GridNotifiers.h"
@@ -45,9 +49,6 @@ enum Events
 };
 
 // 39612 - Spatial Flux (trash)
-// To-do: 
-//  - Find out what Dummy Nuke (68991) spell does.
-//  - Spatial Flux won't enter combat on second aggro from creature group.
 class npc_hoo_spatial_flux : public CreatureScript
 {
 public:
