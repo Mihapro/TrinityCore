@@ -252,6 +252,7 @@ DB2Storage<UnitPowerBarEntry>                   sUnitPowerBarStore("UnitPowerBar
 DB2Storage<VehicleEntry>                        sVehicleStore("Vehicle.db2", VehicleLoadInfo::Instance());
 DB2Storage<VehicleSeatEntry>                    sVehicleSeatStore("VehicleSeat.db2", VehicleSeatLoadInfo::Instance());
 DB2Storage<WMOAreaTableEntry>                   sWMOAreaTableStore("WMOAreaTable.db2", WmoAreaTableLoadInfo::Instance());
+DB2Storage<WorldEffectEntry>                    sWorldEffectStore("WorldEffect.db2", WorldEffectLoadInfo::Instance());
 DB2Storage<WorldMapAreaEntry>                   sWorldMapAreaStore("WorldMapArea.db2", WorldMapAreaLoadInfo::Instance());
 DB2Storage<WorldMapOverlayEntry>                sWorldMapOverlayStore("WorldMapOverlay.db2", WorldMapOverlayLoadInfo::Instance());
 DB2Storage<WorldMapTransformsEntry>             sWorldMapTransformsStore("WorldMapTransforms.db2", WorldMapTransformsLoadInfo::Instance());
@@ -661,6 +662,7 @@ void DB2Manager::LoadStores(std::string const& dataPath, uint32 defaultLocale)
     LOAD_DB2(sVehicleStore);
     LOAD_DB2(sVehicleSeatStore);
     LOAD_DB2(sWMOAreaTableStore);
+    LOAD_DB2(sWorldEffectStore);
     LOAD_DB2(sWorldMapAreaStore);
     LOAD_DB2(sWorldMapOverlayStore);
     LOAD_DB2(sWorldMapTransformsStore);
@@ -1148,6 +1150,23 @@ std::vector<uint32> DB2Manager::GetAreasForGroup(uint32 areaGroupId) const
     return std::vector<uint32>();
 }
 
+bool DB2Manager::IsInArea(uint32 objectAreaId, uint32 areaId)
+{
+    do
+    {
+        if (objectAreaId == areaId)
+            return true;
+
+        AreaTableEntry const* objectArea = sAreaTableStore.LookupEntry(objectAreaId);
+        if (!objectArea)
+            break;
+
+        objectAreaId = objectArea->ParentAreaID;
+    } while (objectAreaId);
+
+    return false;
+}
+
 std::vector<ArtifactPowerEntry const*> DB2Manager::GetArtifactPowers(uint8 artifactId) const
 {
     auto itr = _artifactPowers.find(artifactId);
@@ -1520,7 +1539,7 @@ std::set<uint32> DB2Manager::GetItemBonusTree(uint32 itemId, uint32 itemBonusTre
         {
             if (bonusTreeNode->BonusTreeModID != itemBonusTreeMod)
                 continue;
-            
+
             if (bonusTreeNode->BonusListID)
             {
                 bonusListIDs.insert(bonusTreeNode->BonusListID);
@@ -1872,6 +1891,23 @@ PowerTypeEntry const* DB2Manager::GetPowerTypeEntry(Powers power) const
 {
     ASSERT(power < MAX_POWERS);
     return _powerTypes[power];
+}
+
+PowerTypeEntry const* DB2Manager::GetPowerTypeByName(std::string const& name) const
+{
+    for (PowerTypeEntry const* powerType : sPowerTypeStore)
+    {
+        std::string powerName = powerType->PowerTypeToken;
+        std::transform(powerName.begin(), powerName.end(), powerName.begin(), [](char c) { return char(::tolower(c)); });
+        if (powerName == name)
+            return powerType;
+
+        powerName.erase(std::remove(powerName.begin(), powerName.end(), '_'), powerName.end());
+        if (powerName == name)
+            return powerType;
+    }
+
+    return nullptr;
 }
 
 std::vector<RewardPackXItemEntry const*> const* DB2Manager::GetRewardPackItemsByRewardID(uint32 rewardPackID) const
