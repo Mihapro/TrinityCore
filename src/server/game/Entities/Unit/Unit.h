@@ -1036,7 +1036,6 @@ class TC_GAME_API Unit : public WorldObject
         void SetHealth(uint64 val);
         void SetMaxHealth(uint64 val);
         inline void SetFullHealth() { SetHealth(GetMaxHealth()); }
-        inline void SetFullPower(Powers power) { SetPower(power, GetMaxPower(power)); }
         int64 ModifyHealth(int64 val);
         int64 GetHealthGain(int64 dVal);
 
