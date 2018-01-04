@@ -59,8 +59,22 @@ class TC_GAME_API Minion : public TempSummon
         Unit* GetOwner() const { return m_owner; }
         float GetFollowAngle() const override { return m_followAngle; }
         void SetFollowAngle(float angle) { m_followAngle = angle; }
-        bool IsPetGhoul() const {return GetEntry() == 26125;} // Ghoul may be guardian or pet
-        bool IsSpiritWolf() const {return GetEntry() == 29264;} // Spirit wolf from feral spirits
+
+        // Warlock pets
+        bool IsPetImp() const { return GetEntry() == 416; }
+        bool IsPetFelhunter() const { return GetEntry() == 691; }
+        bool IsPetVoidwalker() const { return GetEntry() == 1860; }
+        bool IsPetSuccubus() const { return GetEntry() == 1863; }
+        bool IsPetDoomguard() const { return GetEntry() == 18540; }
+        bool IsPetFelguard() const { return GetEntry() == 30146; }
+
+        // Death Knight pets
+        bool IsPetGhoul() const { return GetEntry() == 26125; } // Ghoul may be guardian or pet
+        bool IsPetAbomination() const { return GetEntry() == 106848; } // Sludge Belcher dk talent
+
+        // Shaman pets
+        bool IsSpiritWolf() const { return GetEntry() == 29264; } // Spirit wolf from feral spirits
+
         bool IsGuardianPet() const;
     protected:
         Unit* const m_owner;

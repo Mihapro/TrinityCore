@@ -447,7 +447,7 @@ struct TC_GAME_API CreatureBaseStats
 
     uint32 GenerateHealth(CreatureTemplate const* info) const
     {
-        return uint32(ceil(BaseHealth[info->HealthScalingExpansion] * info->ModHealth * info->ModHealthExtra));
+        return uint32(std::lroundf(BaseHealth[info->HealthScalingExpansion] * info->ModHealth * info->ModHealthExtra));
     }
 
     uint32 GenerateMana(CreatureTemplate const* info) const
@@ -456,12 +456,12 @@ struct TC_GAME_API CreatureBaseStats
         if (!BaseMana)
             return 0;
 
-        return uint32(ceil(BaseMana * info->ModMana * info->ModManaExtra));
+        return uint32(std::lroundf(BaseMana * info->ModMana * info->ModManaExtra));
     }
 
     uint32 GenerateArmor(CreatureTemplate const* info) const
     {
-        return uint32(ceil(BaseArmor * info->ModArmor));
+        return uint32(std::lroundf(BaseArmor * info->ModArmor));
     }
 
     float GenerateBaseDamage(CreatureTemplate const* info) const

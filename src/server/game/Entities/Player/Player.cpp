@@ -18014,7 +18014,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SQLQueryHolder *holder)
     uint32 loadedPowers = 0;
     for (uint32 i = 0; i < MAX_POWERS; ++i)
     {
-        if (GetPowerIndex(i) != MAX_POWERS)
+        if (GetPowerIndex(Powers(i)) != MAX_POWERS)
         {
             uint32 savedPower = fields[56 + loadedPowers].GetUInt32();
             uint32 maxPower = GetUInt32Value(UNIT_FIELD_MAXPOWER + loadedPowers);
@@ -19809,7 +19809,7 @@ void Player::SaveToDB(bool create /*=false*/)
         uint32 storedPowers = 0;
         for (uint32 i = 0; i < MAX_POWERS; ++i)
         {
-            if (GetPowerIndex(i) != MAX_POWERS)
+            if (GetPowerIndex(Powers(i)) != MAX_POWERS)
             {
                 stmt->setUInt32(index++, GetUInt32Value(UNIT_FIELD_POWER + storedPowers));
                 if (++storedPowers >= MAX_POWERS_PER_CLASS)
@@ -19951,7 +19951,7 @@ void Player::SaveToDB(bool create /*=false*/)
         uint32 storedPowers = 0;
         for (uint32 i = 0; i < MAX_POWERS; ++i)
         {
-            if (GetPowerIndex(i) != MAX_POWERS)
+            if (GetPowerIndex(Powers(i)) != MAX_POWERS)
             {
                 stmt->setUInt32(index++, GetUInt32Value(UNIT_FIELD_POWER + storedPowers));
                 if (++storedPowers >= MAX_POWERS_PER_CLASS)
@@ -27315,7 +27315,6 @@ Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetTy
     pet->SetCreatorGUID(GetGUID());
     pet->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, getFaction());
 
-    pet->SetPowerType(POWER_MANA);
     pet->SetUInt64Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
     pet->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
     pet->InitStatsForLevel(getLevel());

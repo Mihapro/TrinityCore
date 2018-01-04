@@ -1036,6 +1036,7 @@ class TC_GAME_API Unit : public WorldObject
         void SetHealth(uint64 val);
         void SetMaxHealth(uint64 val);
         inline void SetFullHealth() { SetHealth(GetMaxHealth()); }
+        inline void SetFullPower(Powers power) { SetPower(power, GetMaxPower(power)); }
         int64 ModifyHealth(int64 val);
         int64 GetHealthGain(int64 dVal);
 
@@ -1521,7 +1522,6 @@ class TC_GAME_API Unit : public WorldObject
         uint32 GetCreateHealth() const { return GetUInt32Value(UNIT_FIELD_BASE_HEALTH); }
         void SetCreateMana(uint32 val) { SetUInt32Value(UNIT_FIELD_BASE_MANA, val); }
         uint32 GetCreateMana() const { return GetUInt32Value(UNIT_FIELD_BASE_MANA); }
-        uint32 GetPowerIndex(uint32 powerType) const;
         int32 GetCreatePowers(Powers power) const;
         float GetPosStat(Stats stat) const { return GetFloatValue(UNIT_FIELD_POSSTAT+stat); }
         float GetNegStat(Stats stat) const { return GetFloatValue(UNIT_FIELD_NEGSTAT+stat); }
@@ -1601,6 +1601,7 @@ class TC_GAME_API Unit : public WorldObject
         virtual void UpdateArmor() = 0;
         virtual void UpdateMaxHealth() = 0;
         virtual void UpdateMaxPower(Powers power) = 0;
+        virtual uint32 GetPowerIndex(Powers power) const = 0;
         virtual void UpdateAttackPowerAndDamage(bool ranged = false) = 0;
         virtual void UpdateDamagePhysical(WeaponAttackType attType);
         float GetTotalAttackPowerValue(WeaponAttackType attType) const;

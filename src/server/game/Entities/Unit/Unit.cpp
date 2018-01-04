@@ -5172,33 +5172,11 @@ void Unit::SetPowerType(Powers new_powertype)
             ToPlayer()->SetGroupUpdateFlag(GROUP_UPDATE_FLAG_POWER_TYPE);
     }
     /*else if (Pet* pet = ToCreature()->ToPet()) TODO 6.x
-    {
         if (pet->isControlled())
-            pet->SetGroupUpdateFlag(GROUP_UPDATE_FLAG_PET_POWER_TYPE);
-    }*/
-
-    float powerMultiplier = 1.0f;
-    if (!IsPet())
-        if (Creature* creature = ToCreature())
-            powerMultiplier = creature->GetCreatureTemplate()->ModMana;
-
-    switch (new_powertype)
-    {
-        default:
-        case POWER_MANA:
-            break;
-        case POWER_RAGE:
-            SetMaxPower(POWER_RAGE, uint32(std::ceil(GetCreatePowers(POWER_RAGE) * powerMultiplier)));
-            SetPower(POWER_RAGE, 0);
-            break;
-        case POWER_FOCUS:
-            SetMaxPower(POWER_FOCUS, uint32(std::ceil(GetCreatePowers(POWER_FOCUS) * powerMultiplier)));
-            SetPower(POWER_FOCUS, uint32(std::ceil(GetCreatePowers(POWER_FOCUS) * powerMultiplier)));
-            break;
-        case POWER_ENERGY:
-            SetMaxPower(POWER_ENERGY, uint32(std::ceil(GetCreatePowers(POWER_ENERGY) * powerMultiplier)));
-            break;
-    }
+            pet->SetGroupUpdateFlag(GROUP_UPDATE_FLAG_PET_POWER_TYPE);*/
+    
+    UpdateMaxPower(new_powertype);
+    SetPower(new_powertype, 0);
 }
 
 void Unit::UpdateDisplayPower()
@@ -5225,11 +5203,28 @@ void Unit::UpdateDisplayPower()
                 AuraEffect const* powerTypeAura = powerTypeAuras.front();
                 displayPower = Powers(powerTypeAura->GetMiscValue());
             }
-            else
+            else if (GetTypeId() == TYPEID_PLAYER)
             {
                 ChrClassesEntry const* cEntry = sChrClassesStore.LookupEntry(getClass());
                 if (cEntry && cEntry->PowerType < MAX_POWERS)
                     displayPower = Powers(cEntry->PowerType);
+            }
+            else if (GetTypeId() == TYPEID_UNIT)
+            {
+                if (Vehicle* vehicle = GetVehicle())
+                {
+                    if (PowerDisplayEntry const* powerDisplay = sPowerDisplayStore.LookupEntry(vehicle->GetVehicleInfo()->PowerDisplayID[0]))
+                        displayPower = Powers(powerDisplay->PowerType);
+                    else if (getClass() == CLASS_ROGUE)
+                        displayPower = POWER_ENERGY;
+                }
+                else if (Pet* pet = ToPet())
+                {
+                    if (pet->getPetType() == HUNTER_PET) // Hunter pets have focus
+                        displayPower = POWER_FOCUS;
+                    else if (pet->IsPetGhoul() || pet->IsPetAbomination()) // DK pets have energy
+                        displayPower = POWER_ENERGY;
+                }
             }
             break;
         }
@@ -5920,10 +5915,6 @@ void Unit::SetMinion(Minion *minion, bool apply)
         if (GetTypeId() == TYPEID_PLAYER && minion->IsPet())
             for (uint8 i = 0; i < MAX_MOVE_TYPE; ++i)
                 minion->SetSpeedRate(UnitMoveType(i), m_speed_rate[i]);
-
-        // Ghoul pets have energy instead of mana (is anywhere better place for this code?)
-        if (minion->IsPetGhoul())
-            minion->SetPowerType(POWER_ENERGY);
 
         // Send infinity cooldown - client does that automatically but after relog cooldown needs to be set again
         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(minion->GetUInt32Value(UNIT_CREATED_BY_SPELL));
@@ -9482,10 +9473,8 @@ void Unit::SetPower(Powers power, int32 val)
             player->SetGroupUpdateFlag(GROUP_UPDATE_FLAG_CUR_POWER);
     }
     /*else if (Pet* pet = ToCreature()->ToPet()) TODO 6.x
-    {
         if (pet->isControlled())
-            pet->SetGroupUpdateFlag(GROUP_UPDATE_FLAG_PET_CUR_POWER);
-    }*/
+            pet->SetGroupUpdateFlag(GROUP_UPDATE_FLAG_PET_CUR_POWER);*/
 }
 
 void Unit::SetMaxPower(Powers power, int32 val)
@@ -9504,26 +9493,11 @@ void Unit::SetMaxPower(Powers power, int32 val)
             ToPlayer()->SetGroupUpdateFlag(GROUP_UPDATE_FLAG_MAX_POWER);
     }
     /*else if (Pet* pet = ToCreature()->ToPet()) TODO 6.x
-    {
         if (pet->isControlled())
-            pet->SetGroupUpdateFlag(GROUP_UPDATE_FLAG_PET_MAX_POWER);
-    }*/
+            pet->SetGroupUpdateFlag(GROUP_UPDATE_FLAG_PET_MAX_POWER);*/
 
     if (val < cur_power)
         SetPower(power, val);
-}
-
-uint32 Unit::GetPowerIndex(uint32 powerType) const
-{
-    /// This is here because hunter pets are of the warrior class.
-    /// With the current implementation, the core only gives them
-    /// POWER_RAGE, so we enforce the class to hunter so that they
-    /// effectively get focus power.
-    uint32 classId = getClass();
-    if (ToPet() && ToPet()->getPetType() == HUNTER_PET)
-        classId = CLASS_HUNTER;
-
-    return sDB2Manager.GetPowerIndexByClass(powerType, classId);
 }
 
 int32 Unit::GetCreatePowers(Powers power) const
